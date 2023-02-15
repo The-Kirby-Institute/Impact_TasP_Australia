@@ -60,59 +60,131 @@ but the locations for references are in bold.
 ```{r Set-up}
 # Open as a project (setting working directory to source and restarting R)
 
-# Set-up directories
-basePath <- getwd() 
-resultsFolder <- file.path(basePath, "output")
-
 # Load standard libraries and options
 library(tidyverse)
 library(LeftysRpkg)
 library(captioner)
 library(knitr)
 
-# 
+# Set-up directories
+basePath <- getwd() 
+resultsFolder <- file.path(basePath, "output")
+
+# Set-up overarching variables 
 currTime <- format(Sys.time(), "%y-%m-%d_%H-%M-%S") # for appending to 
-                                                    # output files
+# output files
 ```
 
-```{r Project specification parmaters}
+```{r Simulation specification parameters}
 # User inputs for running code. Defaults are to run everything from scratch. 
 
 # Specifications for loading previously generated results or saving results
-# to file. The basic format of a file string is: date_time_fileTag_(" Inputs" or 
-# " Results").R. 
+# to file. The basic format of a file string is: currTime_saveFileTag.Rda 
 
-# The defaults are set to FALSE and the user has to manually specify the file to load. This is set up so long simulation runs do not need to be repeated.
+# The defaults are set to FALSE and the user has to manually specify the file 
+# to load. This is set up so long simulation runs do not need to be repeated.
 
 # Manually enter file name tag to regenerate old results
 loadFileTag <-  NULL # set to NULL to run things from scratch
 
 if (is.null(loadFileTag)) {
-  # Set to default values 
-  loadProject <- FALSE    # set to FALSE to run things a fresh.
-  loadParameters <- FALSE # set to FALSE to reload and re-generate parameter sets
-  loadResults <- FALSE    # set to FALSE to generate new results 
-
-  useSeed <- FALSE        # set to FALSE to create new seed for generating results
-  
-  saveFileTag <- "_v1.0" # default tag for output file names to specify scenarios
-  
-  saveProject <- TRUE    # save project, parameters, and results files
-
+    # Set to default values 
+    loadProject <- FALSE    # set to FALSE to run things a fresh.
+    loadParameters <- FALSE # set to FALSE to reload and re-generate parameter sets
+    loadResults <- FALSE    # set to FALSE to generate new results 
+    
+    useSeed <- FALSE        # set to FALSE to create new seed for generating results
+    
+    saveProject <- TRUE    # save project, parameters, and results files
+    
 } else {
-  # Manually specify values to re-generate what you want
-  
-  # If any of the following are TRUE the corresponding project and results files
-  # need to exist. 
-  loadProject <- FALSE    # Set to TRUE to load in project specifications
-  loadParameters <- FALSE # Set to TRUE to load in parameters and parameter sets
-  loadResults <- FALSE    # Set to TRUE to load in results
-  
-  useSeed <- FALSE  # Set to true to use seed in project file else create new one  
-  
-  saveFileTag <- "_v1.0"  # tag for output file names to specify scenarios
-  
-  saveProject <- TRUE    # save project, parameters, and results files
-
+    ######################################################
+    # Manually specify values to re-generate what you want
+    ######################################################
+    
+    # If any of the following are TRUE the corresponding project and results files
+    # need to exist. 
+    loadProject <- FALSE    # Set to TRUE to load in project specifications
+    loadParameters <- FALSE # Set to TRUE to load in parameters and parameter sets
+    loadResults <- FALSE    # Set to TRUE to load in results
+    
+    useSeed <- FALSE  # Set to true to use seed in project file else create new one  
+    
+    saveProject <- TRUE    # save project, parameters, and results files
+    
 }
+
+# Store specifications in a list
+simSpecs <- tibble::lst(loadFileTag, loadProject, loadParameters, loadResults, 
+    useSeed, saveProject)
+
 ```
+
+```{r User specified analysis variables}
+
+###################################
+# User specified analysis variables
+###################################
+
+# Depending on value of loadProject enter specifications for the analysis
+
+if (!loadProject) {
+    # If not loading from previously created file specify analysis inputs for 
+    # running the calculations
+    
+    name <- "Impact_TasP_Australia-Testing" 
+    saveFileTag <- "Testing"
+    
+    startYear <- 2010 
+    endYear <- 2019      
+    
+    numsims <- 1000      # number of sampled parameter sets to run
+    
+    # Generate and store a random integer for set.seed so we can rerun 
+    # things exactly if we want to
+    currseed <- sample(1:10^6, 1)
+    set.seed(currseed)
+    
+    projectVars <- tibble::lst(name, saveFileTag, startYear, endYear, numsims, 
+        currseed)
+    
+} else {
+    # Load previously generated project — to do this we need to save current 
+    # simSpecs from the previous chunk and then restored because they we be over 
+    # written when loading the project 
+    
+    oldSimSpecs <- simSpecs
+    
+    load(paste0(loadFileTag, ".Rda"))
+    
+    simSpecs <- oldSimSpecs
+    
+}
+
+#-------------------------------------------------------------------------------
+# Save all final analysis specifications in a list 
+project <- tibble::lst(currTime, simSpecs, projectVars)
+
+```
+
+```{r Parameters set-up}
+
+```
+
+```{r Analysis functions}
+
+```
+
+```{r Run simulations}
+
+```
+
+```{r Analyse results and generate plots}
+
+```
+
+```{r Save project and output}
+
+```
+
+
