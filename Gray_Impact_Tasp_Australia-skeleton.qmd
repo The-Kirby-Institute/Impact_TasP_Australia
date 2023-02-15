@@ -1,0 +1,118 @@
+---
+title: "Impact of U=U in Australia (skeleton)"
+# date: Current draft produced `r format(Sys.Date(), format="%B %d, %Y")`.
+author:
+  - Richard T. Gray # PhD:
+      # email: Rgray@kirby.unsw.edu.au
+      # institute: [KI]
+      # correspondence: true
+# institute: 
+#    - KI: 
+#       name: The Kirby Institute, UNSW Sydney, Sydney NSW 2052, Australia
+#       address: Level 6, Wallace Wurth Building High Street, UNSW Sydney Kensington NSW 2052
+format:
+  docx:
+    reference-doc: "C:/Users/rgray/OneDrive - UNSW/R/LeftysRstuff/Rmarkdown/mystyles_Paper.docx"
+    number-sections: false
+    page-width: 8.25
+    filters: 
+      # - pagebreak.lua
+      # - scholarly-metadata.lua
+      # - author-info-blocks.lua
+      - C:/Users/rgray/OneDrive - UNSW/R/LeftysRstuff/Rmarkdown/filters/pagebreak.lua
+      - C:/Users/rgray/OneDrive - UNSW/R/LeftysRstuff/Rmarkdown/filters/scholarly-metadata.lua
+      - C:/Users/rgray/OneDrive - UNSW/R/LeftysRstuff/Rmarkdown/filters/author-info-blocks.lua
+      
+editor: visual
+execute:
+  include: false
+  echo: false
+  warning: false
+  message: false
+editor_options:
+  markdown:
+    wrap: 80
+  canonical: true
+# bibliography: references.bib
+---
+
+<!--- Frontmatter that I can't put into Yaml (as far as I can tell) --->
+
+The Kirby Institute, UNSW Sydney, Sydney, NSW, Australia.
+
+Current draft produced `r format(Sys.Date(), format="%B %d, %Y")`.
+
+**Manuscript details**
+
+-   Word count abstract:
+-   Word count main text:
+-   References:
+-   Figures:
+-   Tables:
+
+Skeleton of the Impact of U=U paper. Only a simple model is used so this Quarto
+document contains the code and results generation. Things that need to be fixed
+in the corresponding Word document are in bold. References are not added here
+but the locations for references are in bold.
+
+<!--- The following code chunks set up the model and results generation for the paper--->
+
+```{r Set-up}
+# Open as a project (setting working directory to source and restarting R)
+
+# Set-up directories
+basePath <- getwd() 
+resultsFolder <- file.path(basePath, "output")
+
+# Load standard libraries and options
+library(tidyverse)
+library(LeftysRpkg)
+library(captioner)
+library(knitr)
+
+# 
+currTime <- format(Sys.time(), "%y-%m-%d_%H-%M-%S") # for appending to 
+                                                    # output files
+```
+
+```{r Project specification parmaters}
+# User inputs for running code. Defaults are to run everything from scratch. 
+
+# Specifications for loading previously generated results or saving results
+# to file. The basic format of a file string is: date_time_fileTag_(" Inputs" or 
+# " Results").R. 
+
+# The defaults are set to FALSE and the user has to manually specify the file to load. This is set up so long simulation runs do not need to be repeated.
+
+# Manually enter file name tag to regenerate old results
+loadFileTag <-  NULL # set to NULL to run things from scratch
+
+if (is.null(loadFileTag)) {
+  # Set to default values 
+  loadProject <- FALSE    # set to FALSE to run things a fresh.
+  loadParameters <- FALSE # set to FALSE to reload and re-generate parameter sets
+  loadResults <- FALSE    # set to FALSE to generate new results 
+
+  useSeed <- FALSE        # set to FALSE to create new seed for generating results
+  
+  saveFileTag <- "_v1.0" # default tag for output file names to specify scenarios
+  
+  saveProject <- TRUE    # save project, parameters, and results files
+
+} else {
+  # Manually specify values to re-generate what you want
+  
+  # If any of the following are TRUE the corresponding project and results files
+  # need to exist. 
+  loadProject <- FALSE    # Set to TRUE to load in project specifications
+  loadParameters <- FALSE # Set to TRUE to load in parameters and parameter sets
+  loadResults <- FALSE    # Set to TRUE to load in results
+  
+  useSeed <- FALSE  # Set to true to use seed in project file else create new one  
+  
+  saveFileTag <- "_v1.0"  # tag for output file names to specify scenarios
+  
+  saveProject <- TRUE    # save project, parameters, and results files
+
+}
+```
