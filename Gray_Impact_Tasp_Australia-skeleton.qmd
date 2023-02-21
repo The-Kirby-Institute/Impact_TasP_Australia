@@ -68,6 +68,7 @@ library(knitr)
 
 # Set-up directories
 basePath <- getwd() 
+dataFolder <- file.path(basePath, "data")
 resultsFolder <- file.path(basePath, "output")
 
 # Set-up overarching variables 
@@ -85,97 +86,299 @@ currTime <- format(Sys.time(), "%y-%m-%d_%H-%M-%S") # for appending to
 # to load. This is set up so long simulation runs do not need to be repeated.
 
 # Manually enter file name tag to regenerate old results
-loadFileTag <-  NULL # set to NULL to run things from scratch
+loadFileTag <-  "Testing" # set to NULL to run things from scratch
 
 if (is.null(loadFileTag)) {
-    # Set to default values 
-    loadProject <- FALSE    # set to FALSE to run things a fresh.
-    loadParameters <- FALSE # set to FALSE to reload and re-generate parameter sets
-    loadResults <- FALSE    # set to FALSE to generate new results 
-    
-    useSeed <- FALSE        # set to FALSE to create new seed for generating results
-    
-    saveProject <- TRUE    # save project, parameters, and results files
-    
+  # Set to default values 
+  loadProject <- FALSE    # set to FALSE to run things a fresh.
+  loadParameters <- FALSE # set to FALSE to reload and re-generate parameter sets
+  loadResults <- FALSE    # set to FALSE to generate new results 
+  
+  useSeed <- FALSE        # set to FALSE to create new seed for generating results
+  
+  saveProject <- TRUE    # save project, parameters, and results files
+  
 } else {
-    ######################################################
-    # Manually specify values to re-generate what you want
-    ######################################################
-    
-    # If any of the following are TRUE the corresponding project and results files
-    # need to exist. 
-    loadProject <- FALSE    # Set to TRUE to load in project specifications
-    loadParameters <- FALSE # Set to TRUE to load in parameters and parameter sets
-    loadResults <- FALSE    # Set to TRUE to load in results
-    
-    useSeed <- FALSE  # Set to true to use seed in project file else create new one  
-    
-    saveProject <- TRUE    # save project, parameters, and results files
-    
+  
+  # Manually specify values to re-generate what you want------------------------
+  
+  # If any of the following are TRUE the corresponding project and results files
+  # need to exist. 
+  loadProject <- FALSE    # Set to TRUE to load in project specifications
+  loadParameters <- FALSE # Set to TRUE to load in parameters and parameter sets
+  loadResults <- FALSE    # Set to TRUE to load in results
+  
+  loadParameters <- ifelse(!loadProject, FALSE, loadParameters)
+  loadResults <- ifelse(!loadProject, FALSE, loadResults)
+  
+  useSeed <- FALSE  # Set to true to use seed in project file else create new one  
+  
+  saveProject <- TRUE    # save project, parameters, and results files
+  
 }
 
 # Store specifications in a list
 simSpecs <- tibble::lst(loadFileTag, loadProject, loadParameters, loadResults, 
-    useSeed, saveProject)
+  useSeed, saveProject)
 
 ```
 
 ```{r User specified analysis variables}
 
-###################################
-# User specified analysis variables
-###################################
+# User specified analysis variables---------------------------------------------
 
 # Depending on value of loadProject enter specifications for the analysis
 
 if (!loadProject) {
-    # If not loading from previously created file specify analysis inputs for 
-    # running the calculations
+  # If not loading from previously created file specify analysis inputs for 
+  # running the calculations
+  
+  name <- "Impact_TasP_Australia-Testing" 
+  saveFileTag <- "Testing"
+  
+  startYear <- 2009 
+  endYear <- 2019  
+  
+  years <- startYear:endYear
+  nyears <- length(years)
+  
+  numsims <- 0 # number of sampled parameter sets to run
+  # Set to 0 or 1 to just do best fit parameters
+  # Recommend for initial sims to make sure things work
+  
+  # Generate and store a random integer for set.seed so we can rerun 
+  # things exactly if we want to
+  currseed <- sample(1:10^6, 1)
+  set.seed(currseed)
+  
+  projectVars <- tibble::lst(name, saveFileTag, startYear, endYear, years, 
+    nyears, numsims, currseed)
+  
+  # Create parameter csv files if they don't already exist
+  if (!file.exists(file.path(resultsFolder, paste0(saveFileTag, 
+    "_parameters_fixed.csv")))){
     
-    name <- "Impact_TasP_Australia-Testing" 
-    saveFileTag <- "Testing"
+    # TODO: Add costing parameters
+    paramsVector <- c(
+      "effart" = "Effectiveness of ART", 
+      "effprep" = "Effectiveness of PrEP", 
+      "effcondom" = "Effectiveness of condom use",
+      "plhiv_range" = "Range in PLHIV estimates",
+      "prop_art_range" = "Range in ART coverage",
+      "prop_vs_range" = "Range in viral suppression estimates",
+      "prop_prep_range" = "Range in PrEP coverage",
+      "prop_condom_range" = "Range in condom use"
+    ) 
     
-    startYear <- 2010 
-    endYear <- 2019      
+    paramsFixed <- tibble(
+      parameter = unname(paramsVector),
+      estimate = rep('', length(paramsVector)),
+      lower = rep('', length(paramsVector)),
+      upper = rep('', length(paramsVector)),
+      code_variable = names(paramsVector), 
+      notes = rep('', length(paramsVector)), 
+    )
     
-    numsims <- 1000      # number of sampled parameter sets to run
+    write_csv(paramsFixed , file.path(resultsFolder, paste0(saveFileTag, 
+      "_parameters_fixed.csv")))
     
-    # Generate and store a random integer for set.seed so we can rerun 
-    # things exactly if we want to
-    currseed <- sample(1:10^6, 1)
-    set.seed(currseed)
+    # Now do time varying file
+    paramsTime <- tibble(
+      year = years,
+      plhiv = rep('', nyears), 
+      prop_diagnosed = rep('', nyears),
+      prop_art = rep('', nyears),
+      prop_vs = rep('', nyears),
+      prop_prep = rep('', nyears),
+      prop_condoms = rep('', nyears)
+    )
     
-    projectVars <- tibble::lst(name, saveFileTag, startYear, endYear, numsims, 
-        currseed)
+    write_csv(paramsTime, file.path(resultsFolder, paste0(saveFileTag, 
+      "_parameters_variable.csv")))
     
+  }
+  
+  # Save all final analysis specifications in a list -----------------------------
+  project <- tibble::lst(currTime, simSpecs, projectVars)
+  
+  if (saveProject) {
+    save(project, file = file.path(resultsFolder, paste0(saveFileTag, "_project.Rda")))
+  }
+  
 } else {
-    # Load previously generated project — to do this we need to save current 
-    # simSpecs from the previous chunk and then restored because they we be over 
-    # written when loading the project 
-    
-    oldSimSpecs <- simSpecs
-    
-    load(paste0(loadFileTag, ".Rda"))
-    
-    simSpecs <- oldSimSpecs
-    
+  # Load previously generated project — to do this we need to save current 
+  # simSpecs from the previous chunk and then restore them because they will be 
+  # over written when loading the project 
+  
+  oldSimSpecs <- simSpecs
+  
+  load(file.path(resultsFolder, paste0(loadFileTag, "_project.Rda")))
+  
+  simSpecs <- oldSimSpecs
+  project$simSpecs <- simSpecs
+  
 }
-
-#-------------------------------------------------------------------------------
-# Save all final analysis specifications in a list 
-project <- tibble::lst(currTime, simSpecs, projectVars)
 
 ```
 
 ```{r Parameters set-up}
+# This chunk reads in the parameter input files and coverts them into parameter 
+# sets for input into the model simulations
+
+# TODO: Decide if we need beta distributions. Currently just using uniform 
+# distributions for sampling.  
+
+if (!loadParameters) {
+  
+  # Read in parameter files
+  parametersFixed <- read_csv(file.path(resultsFolder, paste0(saveFileTag, 
+    "_parameters_fixed.csv")))
+  parametersVar <- read_csv(file.path(resultsFolder, paste0(saveFileTag, 
+    "_parameters_variable.csv")))
+  
+  # Set-up best fit parameters -------------------------------------------------
+  paramsBest <- parametersFixed %>%
+    select(code_variable, estimate) %>%
+    # Only need these parameters for the model the others are for setting up
+    # parameter sets
+    filter(code_variable %in% c("effart", "effprep", "effcondom")) %>%
+    spread(code_variable, estimate) %>%
+    slice(rep(row_number(), nyears)) %>%
+    bind_cols(parametersVar) %>%
+    mutate(simset = 1) %>%
+    select(simset, year, everything())
+  
+  # Generate parameter sets for all simulations --------------------------------
+  paramsSets <- list()
+  
+  if (numsims > 1) {
+    
+    # Reset seed 
+    set.seed(currseed)
+    
+    # Separate the parameters into two sets those that are inputs in the 
+    # model and those that are used to produce uncertainty in the time series 
+    # variables. The time series variables need to be sampled twice for the
+    # start and end of the time series. 
+    params2sampleOnce <- c("effart", "effprep", "effcondom")
+    params2sampletwice <- c("plhiv", "prop_leave", "prop_art", "prop_vs", 
+      "prop_prep", "prop_condom", "diagnosed_os")  
+    
+    paramsSets[["simset"]] <- rep(1:nyears, each = numsims)
+    
+    # Fixed parameters
+    for (var in params2sampleOnce) {
+      # Sample from parameter range and duplicate across years
+      temp <- runif(numsims,(parametersFixed %>% filter(code_variable == var))$lower, 
+        (parametersFixed %>% filter(code_variable == var))$upper) 
+      temp <- rep(temp, each = nyears)
+      
+      paramsSets[[var]] <- temp
+    }
+    
+    # Time varying parameters - sampled from multiplicative factor range at each 
+    # end and then connect linearly to change the best estimate values.  
+    for (var in params2sampletwice) {
+      
+      tempStart <-  runif(numsims,(parametersFixed %>% filter(code_variable == paste0(var, "_range")))$lower, 
+        (parametersFixed %>% filter(code_variable == paste0(var,"_range")))$upper)
+      tempEnd <- runif(numsims,(parametersFixed %>% filter(code_variable == paste0(var, "_range")))$lower, 
+        (parametersFixed %>% filter(code_variable == paste0(var, "_range")))$upper)
+      
+      # Update best estimate using sampled multiplicative factors for each sim
+      varVector <- vector()
+      for (ii in 1:numsims) {
+        
+        varVector <- c(varVector, seq(tempStart[ii], tempEnd[ii], length = nyears) *
+            parametersVar[[var]])
+        
+        paramsSets[[var]] <- varVector
+        
+      }
+    }
+    
+    # Convert to tibble
+    paramsSets <- as_tibble(paramsSets)
+    
+  } # Else paramsSets is a NULL
+  
+  # Save parameters in a separate file
+  if (saveProject) {
+    save(paramsBest, paramsSets, file = file.path(resultsFolder, 
+      paste0(saveFileTag, "_parameters.Rda")))
+  }
+  
+} else {
+  # Load parmaeter sets from file - paramsBest, paramsSets
+  load(file.path(resultsFolder, paste0(loadFileTag, "_parameters.Rda")))
+}
 
 ```
 
 ```{r Analysis functions}
+# This functions and the key functions used for the analysis. 
+
+# This is the main function for the analysis calculating the number of new
+# infections for a given year from the input data
+NewInfections <- function(plhiv, beta, propdiag, propart, propvs, effart, propprep, effprep,
+  condom0, condomt, effcondom) {
+  
+  return(plhiv * beta *(1 - propdiag * propart*propvs*effart) * 
+      (1 - propprep * effprep) * (1 - effcondom * condomt) / 
+      (1 - effcondom * condom0))
+  
+}
+
+# Define a function to calculate beta given a new infections estimate and other 
+# parameter values. This is used at the initial time point using available data
+# for the starting year (startYear). This values of beta is than used in the
+# simulations. 
+
+Beta <- function(incidence, plhiv, propdiag, propart, propvs, effart, propprep, effprep){
+  return(incidence / (plhiv * (1 - propdiag * propart * propvs * effart) * 
+      (1 - propprep * effprep)))
+}
+
 
 ```
 
-```{r Run simulations}
+```{r Run simulations - baseline}
+
+# Initialize results
+infected <- rep(0, nyears)
+beta <- rep(0, nyears)
+newInfects <- rep(0, nyears)
+diagnosed <- rep(0, nyears)
+numArt <- rep(0, nyears)
+
+infected[1] <- paramsBest$plhiv[1] 
+newInfects[1] <- paramsBest$diagnoses[1]
+diagnosed[1] <- plhiv[1] * paramsBest$prop_diagnosed[1]
+numArt[1] <- diagnosed[1] * paramsBest$prop_art[1]
+
+betaBest <- Beta(newInfects[1], plhiv[1], paramsBest$prop_diagnosed[1],
+  paramsBest$prop_art[1], paramsBest$prop_vs[1], paramsBest$effart[1],
+  paramsBest$prop_prep[1], paramsBest$effprep[1])
+
+for (ii in 2:nyears) {
+  
+  infected[ii] <- infected[ii-1]  + newInfects[ii-1] + paramsBest$diagnosed_os[ii]
+  
+  newInfects[ii] <- NewInfections(infected[ii], betaBest, paramsBest$prop_diagnosed[ii],
+    paramsBest$prop_art[ii], paramsBest$prop_vs[ii], paramsBest$effart[ii], 
+    paramsBest$prop_prep[ii], paramsBest$effprep[ii], 
+    paramsBest$prop_condom[1], paramsBest$prop_condom[ii], 
+    paramsBest$effcondom[ii])
+}
+
+infected
+round(newInfects)
+paramsBest$diagnoses
+
+# 
+```
+
+```{r Validation}
 
 ```
 
