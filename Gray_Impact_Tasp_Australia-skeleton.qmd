@@ -142,7 +142,7 @@ if (!loadProject) {
   years <- startYear:endYear
   nyears <- length(years)
   
-  numsims <- 0 # number of sampled parameter sets to run
+  numsims <- 10 # number of sampled parameter sets to run
   # Set to 0 or 1 to just do best fit parameters
   # Recommend for initial sims to make sure things work
   
@@ -261,10 +261,10 @@ if (!loadParameters) {
     # variables. The time series variables need to be sampled twice for the
     # start and end of the time series. 
     params2sampleOnce <- c("effart", "effprep", "effcondom")
-    params2sampletwice <- c("plhiv", "prop_leave", "prop_art", "prop_vs", 
-      "prop_prep", "prop_condom", "diagnosed_os")  
+    params2sampletwice <- c("plhiv", "prop_leave", "prop_diagnosed", "prop_art", 
+      "prop_vs", "prop_prep", "prop_condom", "diagnoses", "diagnosed_os")  
     
-    paramsSets[["simset"]] <- rep(1:nyears, each = numsims)
+    paramsSets[["simset"]] <- rep(1:numsims, each = nyears)
     
     # Fixed parameters
     for (var in params2sampleOnce) {
@@ -318,10 +318,12 @@ if (!loadParameters) {
 ```{r Analysis functions}
 # This functions and the key functions used for the analysis. 
 
+
+# Mian function ----------------------------------------------------------------
 # This is the main function for the analysis calculating the number of new
 # infections for a given year from the input data
-NewInfections <- function(plhiv, beta, propdiag, propart, propvs, effart, propprep, effprep,
-  condom0, condomt, effcondom) {
+NewInfections <- function(plhiv, beta, propdiag, propart, propvs, effart, 
+  propprep, effprep, condom0, condomt, effcondom) {
   
   return(plhiv * beta *(1 - propdiag * propart*propvs*effart) * 
       (1 - propprep * effprep) * (1 - effcondom * condomt) / 
@@ -329,53 +331,89 @@ NewInfections <- function(plhiv, beta, propdiag, propart, propvs, effart, proppr
   
 }
 
+# Beta calculation function ----------------------------------------------------
 # Define a function to calculate beta given a new infections estimate and other 
 # parameter values. This is used at the initial time point using available data
 # for the starting year (startYear). This values of beta is than used in the
 # simulations. 
 
-Beta <- function(incidence, plhiv, propdiag, propart, propvs, effart, propprep, effprep){
+Beta <- function(incidence, plhiv, propdiag, propart, propvs, effart, propprep, 
+  effprep){
   return(incidence / (plhiv * (1 - propdiag * propart * propvs * effart) * 
       (1 - propprep * effprep)))
 }
 
+# Simulation function ----------------------------------------------------------
+
+simulate <- function(numyears, paramsDf) {
+  
+  # Initialize results variables
+  infected <- rep(0, numyears)
+  newInfects <- rep(0, numyears)
+  diagnosed <- rep(0, numyears)
+  numArt <- rep(0, numyears)
+
+  infected[1] <- paramsDf$plhiv[1] 
+  newInfects[1] <- paramsDf$diagnoses[1]
+  diagnosed[1] <- infected[1] * paramsDf$prop_diagnosed[1]
+  numArt[1] <- diagnosed[1] * paramsDf$prop_art[1]
+
+  betaValue <- Beta(newInfects[1], infected[1], paramsDf$prop_diagnosed[1],
+    paramsDf$prop_art[1], paramsDf$prop_vs[1], paramsDf$effart[1],
+    paramsDf$prop_prep[1], paramsDf$effprep[1])
+  
+  for (ii in 2:numyears) {
+    
+  infected[ii] <- infected[ii-1]  + newInfects[ii-1] + paramsDf$diagnosed_os[ii]
+  
+  newInfects[ii] <- NewInfections(infected[ii], betaValue, paramsDf$prop_diagnosed[ii],
+    paramsDf$prop_art[ii], paramsDf$prop_vs[ii], paramsDf$effart[ii], 
+    paramsDf$prop_prep[ii], paramsDf$effprep[ii], 
+    paramsDf$prop_condom[1], paramsDf$prop_condom[ii], 
+    paramsDf$effcondom[ii])
+  
+  diagnosed[ii] <- infected[ii] * paramsDf$prop_diagnosed[ii]
+  numArt[ii] <- diagnosed[ii] * paramsDf$prop_art[ii]
+}
+
+results <- tibble(
+  infected = infected,
+  newInfects = newInfects,
+  diagnosed = diagnosed,
+  numArt = numArt)
+  
+  return(results)
+}
 
 ```
 
 ```{r Run simulations - baseline}
 
-# Initialize results
-infected <- rep(0, nyears)
-beta <- rep(0, nyears)
-newInfects <- rep(0, nyears)
-diagnosed <- rep(0, nyears)
-numArt <- rep(0, nyears)
+# Best estimate results --------------------------------------------------------
 
-infected[1] <- paramsBest$plhiv[1] 
-newInfects[1] <- paramsBest$diagnoses[1]
-diagnosed[1] <- plhiv[1] * paramsBest$prop_diagnosed[1]
-numArt[1] <- diagnosed[1] * paramsBest$prop_art[1]
+resultsBest <- simulate(nyears, paramsBest) %>%
+  mutate(year = years) %>%
+  select(year, everything())
 
-betaBest <- Beta(newInfects[1], plhiv[1], paramsBest$prop_diagnosed[1],
-  paramsBest$prop_art[1], paramsBest$prop_vs[1], paramsBest$effart[1],
-  paramsBest$prop_prep[1], paramsBest$effprep[1])
+# Simulation sets results ------------------------------------------------------
 
-for (ii in 2:nyears) {
+resultsSims <- tibble()
+
+for (ii in 1:numsims) {
   
-  infected[ii] <- infected[ii-1]  + newInfects[ii-1] + paramsBest$diagnosed_os[ii]
+  paramsSim <- paramsSets %>% filter(simset == ii)
   
-  newInfects[ii] <- NewInfections(infected[ii], betaBest, paramsBest$prop_diagnosed[ii],
-    paramsBest$prop_art[ii], paramsBest$prop_vs[ii], paramsBest$effart[ii], 
-    paramsBest$prop_prep[ii], paramsBest$effprep[ii], 
-    paramsBest$prop_condom[1], paramsBest$prop_condom[ii], 
-    paramsBest$effcondom[ii])
+  resultsSim <- simulate(nyears, paramsSim) %>% 
+    mutate(simset = ii, year = years) %>%
+    select(simset, year, everything())
+  
+  resultsSims <- resultsSims %>% bind_rows(resultsSim)
+  
 }
 
-infected
-round(newInfects)
-paramsBest$diagnoses
 
-# 
+
+
 ```
 
 ```{r Validation}
