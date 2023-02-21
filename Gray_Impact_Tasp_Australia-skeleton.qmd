@@ -86,7 +86,7 @@ currTime <- format(Sys.time(), "%y-%m-%d_%H-%M-%S") # for appending to
 # to load. This is set up so long simulation runs do not need to be repeated.
 
 # Manually enter file name tag to regenerate old results
-loadFileTag <-  "Testing" # set to NULL to run things from scratch
+loadFileTag <-  NULL# "23-02-21_19-08-00_Testing" # set to NULL to run things from scratch
 
 if (is.null(loadFileTag)) {
   # Set to default values 
@@ -104,9 +104,9 @@ if (is.null(loadFileTag)) {
   
   # If any of the following are TRUE the corresponding project and results files
   # need to exist. 
-  loadProject <- FALSE    # Set to TRUE to load in project specifications
-  loadParameters <- FALSE # Set to TRUE to load in parameters and parameter sets
-  loadResults <- FALSE    # Set to TRUE to load in results
+  loadProject <- TRUE    # Set to TRUE to load in project specifications
+  loadParameters <- TRUE # Set to TRUE to load in parameters and parameter sets
+  loadResults <- TRUE    # Set to TRUE to load in results
   
   loadParameters <- ifelse(!loadProject, FALSE, loadParameters)
   loadResults <- ifelse(!loadProject, FALSE, loadResults)
@@ -202,7 +202,7 @@ if (!loadProject) {
   project <- tibble::lst(currTime, simSpecs, projectVars)
   
   if (saveProject) {
-    save(project, file = file.path(resultsFolder, paste0(saveFileTag, "_project.Rda")))
+    save(project, file = file.path(resultsFolder, paste0(currTime, "_", saveFileTag, "_project.Rda")))
   }
   
 } else {
@@ -305,7 +305,7 @@ if (!loadParameters) {
   # Save parameters in a separate file
   if (saveProject) {
     save(paramsBest, paramsSets, file = file.path(resultsFolder, 
-      paste0(saveFileTag, "_parameters.Rda")))
+      paste0(currTime, "_", saveFileTag, "_parameters.Rda")))
   }
   
 } else {
@@ -352,35 +352,35 @@ simulate <- function(numyears, paramsDf) {
   newInfects <- rep(0, numyears)
   diagnosed <- rep(0, numyears)
   numArt <- rep(0, numyears)
-
+  
   infected[1] <- paramsDf$plhiv[1] 
   newInfects[1] <- paramsDf$diagnoses[1]
   diagnosed[1] <- infected[1] * paramsDf$prop_diagnosed[1]
   numArt[1] <- diagnosed[1] * paramsDf$prop_art[1]
-
+  
   betaValue <- Beta(newInfects[1], infected[1], paramsDf$prop_diagnosed[1],
     paramsDf$prop_art[1], paramsDf$prop_vs[1], paramsDf$effart[1],
     paramsDf$prop_prep[1], paramsDf$effprep[1])
   
   for (ii in 2:numyears) {
     
-  infected[ii] <- infected[ii-1]  + newInfects[ii-1] + paramsDf$diagnosed_os[ii]
+    infected[ii] <- infected[ii-1]  + newInfects[ii-1] + paramsDf$diagnosed_os[ii]
+    
+    newInfects[ii] <- NewInfections(infected[ii], betaValue, paramsDf$prop_diagnosed[ii],
+      paramsDf$prop_art[ii], paramsDf$prop_vs[ii], paramsDf$effart[ii], 
+      paramsDf$prop_prep[ii], paramsDf$effprep[ii], 
+      paramsDf$prop_condom[1], paramsDf$prop_condom[ii], 
+      paramsDf$effcondom[ii])
+    
+    diagnosed[ii] <- infected[ii] * paramsDf$prop_diagnosed[ii]
+    numArt[ii] <- diagnosed[ii] * paramsDf$prop_art[ii]
+  }
   
-  newInfects[ii] <- NewInfections(infected[ii], betaValue, paramsDf$prop_diagnosed[ii],
-    paramsDf$prop_art[ii], paramsDf$prop_vs[ii], paramsDf$effart[ii], 
-    paramsDf$prop_prep[ii], paramsDf$effprep[ii], 
-    paramsDf$prop_condom[1], paramsDf$prop_condom[ii], 
-    paramsDf$effcondom[ii])
-  
-  diagnosed[ii] <- infected[ii] * paramsDf$prop_diagnosed[ii]
-  numArt[ii] <- diagnosed[ii] * paramsDf$prop_art[ii]
-}
-
-results <- tibble(
-  infected = infected,
-  newInfects = newInfects,
-  diagnosed = diagnosed,
-  numArt = numArt)
+  results <- tibble(
+    infected = infected,
+    newInfects = newInfects,
+    diagnosed = diagnosed,
+    numArt = numArt)
   
   return(results)
 }
@@ -389,34 +389,84 @@ results <- tibble(
 
 ```{r Run simulations - baseline}
 
-# Best estimate results --------------------------------------------------------
-
-resultsBest <- simulate(nyears, paramsBest) %>%
-  mutate(year = years) %>%
-  select(year, everything())
-
-# Simulation sets results ------------------------------------------------------
-
-resultsSims <- tibble()
-
-for (ii in 1:numsims) {
+if (!loadResults) {
   
-  paramsSim <- paramsSets %>% filter(simset == ii)
+  # Best estimate results --------------------------------------------------------
   
-  resultsSim <- simulate(nyears, paramsSim) %>% 
-    mutate(simset = ii, year = years) %>%
-    select(simset, year, everything())
+  resultsBest <- simulate(nyears, paramsBest) %>%
+    mutate(year = years) %>%
+    select(year, everything())
   
-  resultsSims <- resultsSims %>% bind_rows(resultsSim)
+  # Simulation sets results ------------------------------------------------------
+  
+  resultsSims <- tibble()
+  
+  if (numsims > 1) {
+    
+    for (ii in 1:numsims) {
+      
+      paramsSim <- paramsSets %>% filter(simset == ii)
+      
+      resultsSim <- simulate(nyears, paramsSim) %>% 
+        mutate(simset = ii, year = years) %>%
+        select(simset, year, everything())
+      
+      resultsSims <- resultsSims %>% bind_rows(resultsSim)
+      
+    }
+  }
+  
+  # Save parameters in a separate file
+  if (saveProject) {
+    save(resultsBest, resultsSims, file = file.path(resultsFolder, 
+      paste0(currTime, "_", saveFileTag, "_results.Rda")))
+  }
+  
+} else {
+   # Load results from file - resultsBest, resultsSims
+  load(file.path(resultsFolder, paste0(loadFileTag, "_parameters.Rda")))
   
 }
-
-
-
 
 ```
 
 ```{r Validation}
+# Compare the baseline results to available data - plot of plhiv and diagnoses 
+# vs new infections
+
+# Extract results --------------------------------------------------------------
+
+validationData <- paramsBest %>% select(year, plhiv, diagnoses)
+
+plhivPlot <- ggplot(data = resultsSims, aes(x = year, y = infected, group = simset)) + 
+  geom_line(aes(colour = "sims")) +
+  geom_line(data = resultsBest, aes(x = year, y = infected, group = 1, colour = "best")) +
+  geom_point(data = validationData, aes(x = year, y = plhiv, group = 1, color = "data")) +
+  expand_limits(y = c(0, NA)) + 
+  scale_x_continuous(breaks = seq(2009, 2019, by = 2)) + 
+  scale_colour_manual(name = "", 
+    breaks = c("data", "best", "sims"), 
+    values = c("black", "blue", "lightblue"),
+    labels = c("HIV cascade results","Best estimate", "Simulation range")) +
+  xlab("Year") + ylab("Number of people with HIV") + 
+  PlotOptions()
+
+plhivPlot
+
+infectionsPlot <- ggplot(data = resultsSims, aes(x = year, y = newInfects, group = simset)) + 
+  geom_line(aes(colour = "sims")) +
+  geom_line(data = resultsBest, aes(x = year, y = newInfects, group = 1, colour = "best")) +
+  geom_point(data = validationData, aes(x = year, y = diagnoses, group = 1, color = "data")) +
+  expand_limits(y = c(0, NA)) + 
+  scale_x_continuous(breaks = seq(2009, 2019, by = 2)) + 
+  scale_colour_manual(name = "", 
+    breaks = c("data", "best", "sims"), 
+    values = c("black", "blue", "lightblue"),
+    labels = c("New diagnoses","Best estimate", "Simulation range")) +
+  xlab("Year") + ylab("Annual HIV infections") + 
+  PlotOptions()
+
+infectionsPlot
 
 ```
 
