@@ -134,25 +134,27 @@ if (!loadProject) {
   # running the calculations
   
   name <- "Impact_TasP_Australia-Testing" 
-  saveFileTag <- "Testing"
+  saveFileTag <- "Impact_Tasp"
   
   startYear <- 2009 
   endYear <- 2019  
   
+  indexYearART <- 2010 # Year ART is held fixed for counter-factual scenario
+  
   years <- startYear:endYear
   nyears <- length(years)
   
-  numsims <- 10 # number of sampled parameter sets to run
-  # Set to 0 or 1 to just do best fit parameters
-  # Recommend for initial sims to make sure things work
+  numsims <- 1000 # number of sampled parameter sets to run
+                  # Set to 0 or 1 to just do best fit parameters
+                  # Recommended for initial sims to make sure things work
   
   # Generate and store a random integer for set.seed so we can rerun 
   # things exactly if we want to
   currseed <- sample(1:10^6, 1)
   set.seed(currseed)
   
-  projectVars <- tibble::lst(name, saveFileTag, startYear, endYear, years, 
-    nyears, numsims, currseed)
+  projectVars <- tibble::lst(name, saveFileTag, startYear, endYear,
+    indexYearART, years, nyears, numsims, currseed)
   
   # Create parameter csv files if they don't already exist
   if (!file.exists(file.path(resultsFolder, paste0(saveFileTag, 
@@ -190,7 +192,9 @@ if (!loadProject) {
       prop_art = rep('', nyears),
       prop_vs = rep('', nyears),
       prop_prep = rep('', nyears),
-      prop_condoms = rep('', nyears)
+      prop_condoms = rep('', nyears),
+      diagnosed_os = rep('', nyears),
+      diagoses = rep('', nyears)
     )
     
     write_csv(paramsTime, file.path(resultsFolder, paste0(saveFileTag, 
@@ -265,6 +269,7 @@ if (!loadParameters) {
       "prop_vs", "prop_prep", "prop_condom", "diagnoses", "diagnosed_os")  
     
     paramsSets[["simset"]] <- rep(1:numsims, each = nyears)
+    paramsSets[["year"]] <- rep(years, numsims)
     
     # Fixed parameters
     for (var in params2sampleOnce) {
@@ -318,7 +323,6 @@ if (!loadParameters) {
 ```{r Analysis functions}
 # This functions and the key functions used for the analysis. 
 
-
 # Mian function ----------------------------------------------------------------
 # This is the main function for the analysis calculating the number of new
 # infections for a given year from the input data
@@ -328,7 +332,6 @@ NewInfections <- function(plhiv, beta, propdiag, propart, propvs, effart,
   return(plhiv * beta *(1 - propdiag * propart*propvs*effart) * 
       (1 - propprep * effprep) * (1 - effcondom * condomt) / 
       (1 - effcondom * condom0))
-  
 }
 
 # Beta calculation function ----------------------------------------------------
@@ -423,30 +426,43 @@ if (!loadResults) {
   }
   
 } else {
-   # Load results from file - resultsBest, resultsSims
+  # Load results from file - resultsBest, resultsSims
   load(file.path(resultsFolder, paste0(loadFileTag, "_parameters.Rda")))
   
 }
 
 ```
 
+```{r Plot specifications}
+
+# Choose some colours for plotting
+dput(PlotColors("crayons")[c("Black", "Gray", "Blue", "Cornflower", "Red", "Melon")])
+
+plotcols <- c(Black = "#000000", Gray = "#95918c", Blue = "#1f75fe", 
+  Cornflower = "#9aceeb", Red = "#ee204d", Melon = "#fdbcb4")
+
+# Function to extract hex values
+pc <- function(col) unname(plotcols[col])
+
+```
+
+
 ```{r Validation}
 # Compare the baseline results to available data - plot of plhiv and diagnoses 
 # vs new infections
 
 # Extract results --------------------------------------------------------------
-
 validationData <- paramsBest %>% select(year, plhiv, diagnoses)
 
 plhivPlot <- ggplot(data = resultsSims, aes(x = year, y = infected, group = simset)) + 
   geom_line(aes(colour = "sims")) +
-  geom_line(data = resultsBest, aes(x = year, y = infected, group = 1, colour = "best")) +
-  geom_point(data = validationData, aes(x = year, y = plhiv, group = 1, color = "data")) +
+  geom_line(data = resultsBest, aes(group = 1, colour = "best")) +
+  geom_point(data = validationData, aes(y = plhiv, group = 1, color = "data")) +
   expand_limits(y = c(0, NA)) + 
   scale_x_continuous(breaks = seq(2009, 2019, by = 2)) + 
   scale_colour_manual(name = "", 
     breaks = c("data", "best", "sims"), 
-    values = c("black", "blue", "lightblue"),
+    values = c(pc("Black"), pc("Blue"), pc("Cornflower")),
     labels = c("HIV cascade results","Best estimate", "Simulation range")) +
   xlab("Year") + ylab("Number of people with HIV") + 
   PlotOptions()
@@ -455,22 +471,144 @@ plhivPlot
 
 infectionsPlot <- ggplot(data = resultsSims, aes(x = year, y = newInfects, group = simset)) + 
   geom_line(aes(colour = "sims")) +
-  geom_line(data = resultsBest, aes(x = year, y = newInfects, group = 1, colour = "best")) +
-  geom_point(data = validationData, aes(x = year, y = diagnoses, group = 1, color = "data")) +
+  geom_line(data = resultsBest, aes(group = 1, colour = "best")) +
+  geom_point(data = validationData, aes(y = diagnoses, group = 1, color = "data")) +
   expand_limits(y = c(0, NA)) + 
   scale_x_continuous(breaks = seq(2009, 2019, by = 2)) + 
   scale_colour_manual(name = "", 
     breaks = c("data", "best", "sims"), 
-    values = c("black", "blue", "lightblue"),
+    values = c(pc("Black"), pc("Blue"), pc("Cornflower")),
     labels = c("New diagnoses","Best estimate", "Simulation range")) +
   xlab("Year") + ylab("Annual HIV infections") + 
   PlotOptions()
 
 infectionsPlot
 
+# TODO: save plots as PNG and append to results??
+
+```
+
+```{r Run simulations - scenario}
+
+# Produce and run a scenario where the prop on ART remained at the 2010 level
+
+if (!loadResults) {
+  
+  scenarioBest <- paramsBest %>%
+    mutate(prop_art = ifelse(year > indexYearART, 
+      filter(., year == indexYearART)$prop_art, prop_art))
+  
+  # Best estimate scenario results ---------------------------------------------
+  resultsScenarioBest <- simulate(nyears, scenarioBest) %>%
+    mutate(year = years) %>%
+    select(year, everything())
+  
+  # Simulation set scenario results --------------------------------------------
+  
+  resultsScenarioSims <- tibble()
+  
+  if (numsims > 1) {
+    
+    for (ii in 1:numsims) {
+      
+      ScenarioSim <- paramsSets %>% filter(simset == ii) %>%
+        mutate(prop_art = ifelse(year > indexYearART, 
+          filter(., year == indexYearART)$prop_art, prop_art))
+      
+      resultsScenarioSim <- simulate(nyears, ScenarioSim) %>% 
+        mutate(simset = ii, year = years) %>%
+        select(simset, year, everything())
+      
+      resultsScenarioSims <- resultsScenarioSims %>% bind_rows(resultsScenarioSim)
+      
+    }
+  }
+  
+  # Save parameters in a separate file
+  if (saveProject) {
+    save(resultsBest, resultsSims, resultsScenarioBest, resultsScenarioSims, 
+      file = file.path(resultsFolder, paste0(currTime, "_", saveFileTag, 
+        "_results.Rda")))
+  }
+  
+} else {
+  # Load results from file - resultsBest, resultsSims, 
+  # resultsScenarioBest, resultsScenarioSims
+  load(file.path(resultsFolder, paste0(loadFileTag, "_parameters.Rda")))
+}
+
 ```
 
 ```{r Analyse results and generate plots}
+
+# Organize results for plotting ------------------------------------------------
+scenarioResultsBest <- (resultsBest %>% mutate(scenario = "base")) %>%
+  bind_rows(resultsScenarioBest %>% mutate(scenario = "scenario")) %>%
+  select(scenario, year, everything())
+
+scenarioResultsSims <- (resultsSims %>% mutate(scenario = "base")) %>%
+  bind_rows(resultsScenarioSims %>% mutate(scenario = "scenario")) %>%
+  select(scenario, simset, year, everything())
+
+resultsPlhiv <- ggplot(data = scenarioResultsSims, aes(x = year, y = infected, 
+  colour = scenario, group = interaction(scenario, simset))) + 
+  geom_line() + 
+  geom_line(data = (scenarioResultsBest %>% filter(scenario == "base")), 
+    aes(group = 1), colour = pc("Blue")) +
+   geom_line(data = (scenarioResultsBest %>% filter(scenario == "scenario")), 
+    aes(group = 1), colour = pc("Black")) +
+  expand_limits(y = c(0, NA)) + 
+  scale_x_continuous(breaks = seq(2009, 2019, by = 2)) + 
+   scale_colour_manual(name = "", 
+    breaks = c("base", "scenario"), 
+    values = c(pc("Cornflower"), pc("Gray")),
+    labels = c("U=U scenario", "No increase ART")) +
+  xlab("Year") + ylab("Number of people with HIV") + 
+  PlotOptions()
+
+resultsInfects <- ggplot(data = scenarioResultsSims, aes(x = year, y = newInfects, 
+  colour = scenario, group = interaction(scenario, simset))) + 
+  geom_line() + 
+  geom_line(data = (scenarioResultsBest %>% filter(scenario == "base")), 
+    aes(group = 1), colour = pc("Blue")) +
+   geom_line(data = (scenarioResultsBest %>% filter(scenario == "scenario")), 
+    aes(group = 1), colour = pc("Black")) +
+  expand_limits(y = c(0, NA)) + 
+  scale_x_continuous(breaks = seq(2009, 2019, by = 2)) + 
+   scale_colour_manual(name = "", 
+    breaks = c("base", "scenario"), 
+    values = c(pc("Cornflower"), pc("Gray")),
+    labels = c("U=U scenario", "No increase ART")) +
+  xlab("Year") + ylab("Annual HIV infections") + 
+  PlotOptions()
+
+# Cumulative infections --------------------------------------------------------
+
+cumInfects <- scenarioResultsSims %>% 
+  group_by(simset, scenario) %>%
+  summarise(infections = sum(newInfects)) %>%
+  ungroup()
+
+resultsCumInfects <- ggplot(data = cumInfects, aes(x = scenario, y = infections)) + 
+  geom_boxplot(aes(fill = scenario), width = 0.75, alpha = 0.5) +
+  scale_fill_manual(
+    labels = c("base", "scenario"), 
+    values = c(pc("Black"), pc("Cornflower"))) +
+  xlab("") + ylab("Cumulative infections") +
+  scale_x_discrete(labels = c("U=U scenario", "No increase ART")) +
+  expand_limits(y = c(0, NA)) + 
+  PlotOptions() + theme(legend.position = "none")
+
+# Histogram of averted infections ----------------------------------------------
+
+avertedInfects <- cumInfects %>% 
+  spread(scenario, infections) %>%
+  mutate(averted = scenario - base)
+
+resultsAverted <- ggplot(data = avertedInfects, aes(x = averted)) +
+  geom_density(alpha = 0.5, fill = pc("Cornflower")) +
+  xlab("Infections averted") + ylab("Density") +
+  PlotOptions() + theme(legend.position = "none")  
 
 ```
 
