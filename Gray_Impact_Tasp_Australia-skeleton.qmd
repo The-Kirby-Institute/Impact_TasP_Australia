@@ -134,7 +134,7 @@ if (!loadProject) {
   # running the calculations
   
   name <- "Impact_TasP_Australia-Testing" 
-  saveFileTag <- "Impact_Tasp"
+  saveFileTag <- "Impact_Tasp-v2"
   
   startYear <- 2009 
   endYear <- 2019  
@@ -159,17 +159,21 @@ if (!loadProject) {
   # Create parameter csv files if they don't already exist
   if (!file.exists(file.path(resultsFolder, paste0(saveFileTag, 
     "_parameters_fixed.csv")))){
-    
-    # TODO: Add costing parameters
+  
     paramsVector <- c(
       "effart" = "Effectiveness of ART", 
       "effprep" = "Effectiveness of PrEP", 
       "effcondom" = "Effectiveness of condom use",
+      "annual_cost" = "Annual care and treatment cost",
+      "lifetime_cost_0d" = "Lifetime care and treatment cost (0% discounting)", 
+      "lifetime_cost_35d" = "Lifetime care and treatment cost (3.5% discounting)",
+      "lifetime_cost_50d" = "Lifetime care and treatment cost (5.0% discounting)",
       "plhiv_range" = "Range in PLHIV estimates",
       "prop_art_range" = "Range in ART coverage",
       "prop_vs_range" = "Range in viral suppression estimates",
       "prop_prep_range" = "Range in PrEP coverage",
-      "prop_condom_range" = "Range in condom use"
+      "prop_condom_range" = "Range in condom use",
+      "inflation_index_range" = "Range in inflation index"
     ) 
     
     paramsFixed <- tibble(
@@ -194,7 +198,8 @@ if (!loadProject) {
       prop_prep = rep('', nyears),
       prop_condoms = rep('', nyears),
       diagnosed_os = rep('', nyears),
-      diagoses = rep('', nyears)
+      diagoses = rep('', nyears),
+      inflation_index = rep('', nyears)
     )
     
     write_csv(paramsTime, file.path(resultsFolder, paste0(saveFileTag, 
@@ -611,6 +616,11 @@ resultsAverted <- ggplot(data = avertedInfects, aes(x = averted)) +
   PlotOptions() + theme(legend.position = "none")  
 
 ```
+
+```{r Health Economic Calculations}
+
+```
+
 
 ```{r Save project and output}
 
