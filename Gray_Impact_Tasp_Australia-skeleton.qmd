@@ -145,8 +145,8 @@ if (!loadProject) {
   nyears <- length(years)
   
   numsims <- 1000 # number of sampled parameter sets to run
-                  # Set to 0 or 1 to just do best fit parameters
-                  # Recommended for initial sims to make sure things work
+  # Set to 0 or 1 to just do best fit parameters
+  # Recommended for initial sims to make sure things work
   
   # Generate and store a random integer for set.seed so we can rerun 
   # things exactly if we want to
@@ -160,7 +160,7 @@ if (!loadProject) {
   # empty for user to input values
   if (!file.exists(file.path(resultsFolder, paste0(saveFileTag, 
     "_parameters_fixed.csv")))){
-  
+    
     paramsVector <- c(
       "effart" = "Effectiveness of ART", 
       "effprep" = "Effectiveness of PrEP", 
@@ -245,6 +245,31 @@ if (!loadProject) {
 
 ```
 
+```{r Useful functions}
+# This chunk sources useful functions for the set-up and analysis
+
+# Functions to create cumulative inflation indices for each year
+IndexCPI <- function(cpi) {
+  
+  n <- length(cpi)
+  index <- rep(1, n)
+  
+  for (ii in 1:(n-1)) {
+    index[ii] = 
+      prod(cpi[ii:(n-1)])
+  }
+  
+  return(index)
+  
+}  
+
+# Function to adjust inflation by an overall factor
+MultiplyCPI <- function(cpiIndex, factor) {
+  return(factor*(cpiIndex)-1 )
+}
+
+```
+
 ```{r Parameters set-up}
 # This chunk reads in the parameter input files and coverts them into parameter 
 # sets for input into the model simulations
@@ -273,8 +298,24 @@ if (!loadParameters) {
     mutate(simset = 1) %>%
     select(simset, year, everything())
   
+  # Set-up best fit costing vectors 
+  costingsBest <- paramsBest %>% 
+    select(year, inflation_index, annual_cost, lifetime_cost_0d, 
+      lifetime_cost_35d, lifetime_cost_50d) %>%
+    mutate(cumulative_index = IndexCPI(inflation_index),
+      cumulative_index2 = IndexCPI(MultiplyCPI(inflation_index, 2))) %>%
+    mutate(ac_adjusted = cumulative_index * annual_cost,
+      lc0_adjusted = cumulative_index *  lifetime_cost_0d, 
+      lc35_adjusted = cumulative_index *  lifetime_cost_35d,
+      lc50_adjusted = cumulative_index *  lifetime_cost_50d,
+      ac_adjusted2 = cumulative_index2 * annual_cost,
+      lc0_adjusted2 = cumulative_index2 *  lifetime_cost_0d, 
+      lc35_adjusted2 = cumulative_index2 *  lifetime_cost_35d,
+      lc50_adjusted2 = cumulative_index2 *  lifetime_cost_50d)
+  
   # Generate parameter sets for all simulations --------------------------------
   paramsSets <- list()
+  costingSets <- list()
   
   if (numsims > 1) {
     
@@ -328,20 +369,42 @@ if (!loadParameters) {
     }
     
     for (var in paramsFixed) {
-       paramsSets[[var]] <- rep(parametersVar[[var]], numsims)
+      paramsSets[[var]] <- rep(parametersVar[[var]], numsims)
     }
     
     # Convert to tibble
     paramsSets <- as_tibble(paramsSets)
     
-  } # Else paramsSets is a NULL
-  
-  # Save parameters in a separate file
-  if (saveProject) {
-    save(paramsBest, paramsSets, file = file.path(resultsFolder, 
+    # Generate costing sets for all simulations 
+    for (ii in 1:numsims) {
+      tempParams <- paramsSets %>% filter(simset == ii)
+      
+      tempCosts <- tempParams  %>% 
+        select(simset, year, inflation_index, annual_cost, lifetime_cost_0d, 
+          lifetime_cost_35d, lifetime_cost_50d) %>%
+        mutate(cumulative_index = IndexCPI(inflation_index),
+          cumulative_index2 = IndexCPI(MultiplyCPI(inflation_index, 2))) %>%
+        mutate(ac_adjusted = cumulative_index * annual_cost,
+          lc0_adjusted = cumulative_index *  lifetime_cost_0d, 
+          lc35_adjusted = cumulative_index *  lifetime_cost_35d,
+          lc50_adjusted = cumulative_index *  lifetime_cost_50d,
+          ac_adjusted2 = cumulative_index2 * annual_cost,
+          lc0_adjusted2 = cumulative_index2 *  lifetime_cost_0d, 
+          lc35_adjusted2 = cumulative_index2 *  lifetime_cost_35d,
+          lc50_adjusted2 = cumulative_index2 *  lifetime_cost_50d)
+      
+      costingSets <- bind_rows(costingSets, tempCosts)
+      
+    }
+} # Else paramsSets and costingSets are NULL
+
+# Save parameters in a separate file
+if (saveProject) {
+  save(paramsBest, paramsSets, costingsBest, costingSets, 
+    file = file.path(resultsFolder, 
       paste0(currTime, "_", saveFileTag, "_parameters.Rda")))
-  }
-  
+}
+
 } else {
   # Load parmaeter sets from file - paramsBest, paramsSets
   load(file.path(resultsFolder, paste0(loadFileTag, "_parameters.Rda")))
@@ -475,7 +538,6 @@ pc <- function(col) unname(plotcols[col])
 
 ```
 
-
 ```{r Validation}
 # Compare the baseline results to available data - plot of plhiv and diagnoses 
 # vs new infections
@@ -584,11 +646,11 @@ resultsPlhiv <- ggplot(data = scenarioResultsSims, aes(x = year, y = infected,
   geom_line() + 
   geom_line(data = (scenarioResultsBest %>% filter(scenario == "base")), 
     aes(group = 1), colour = pc("Blue")) +
-   geom_line(data = (scenarioResultsBest %>% filter(scenario == "scenario")), 
+  geom_line(data = (scenarioResultsBest %>% filter(scenario == "scenario")), 
     aes(group = 1), colour = pc("Black")) +
   expand_limits(y = c(0, NA)) + 
   scale_x_continuous(breaks = seq(2009, 2019, by = 2)) + 
-   scale_colour_manual(name = "", 
+  scale_colour_manual(name = "", 
     breaks = c("base", "scenario"), 
     values = c(pc("Cornflower"), pc("Gray")),
     labels = c("U=U scenario", "No increase ART")) +
@@ -600,11 +662,11 @@ resultsInfects <- ggplot(data = scenarioResultsSims, aes(x = year, y = newInfect
   geom_line() + 
   geom_line(data = (scenarioResultsBest %>% filter(scenario == "base")), 
     aes(group = 1), colour = pc("Blue")) +
-   geom_line(data = (scenarioResultsBest %>% filter(scenario == "scenario")), 
+  geom_line(data = (scenarioResultsBest %>% filter(scenario == "scenario")), 
     aes(group = 1), colour = pc("Black")) +
   expand_limits(y = c(0, NA)) + 
   scale_x_continuous(breaks = seq(2009, 2019, by = 2)) + 
-   scale_colour_manual(name = "", 
+  scale_colour_manual(name = "", 
     breaks = c("base", "scenario"), 
     values = c(pc("Cornflower"), pc("Gray")),
     labels = c("U=U scenario", "No increase ART")) +
@@ -641,70 +703,9 @@ resultsAverted <- ggplot(data = avertedInfects, aes(x = averted)) +
 
 ```
 
-```{r Health Economic Costings}
+```{r Health Economic Calculations}
 # This chunk set-up the costs for the health economic calculations.
 
-# Functions to create cumulative inflation indices for each year
-IndexCPI <- function(cpi) {
-  
-  n <- length(cpi)
-  index <- rep(1, n)
-  
-  for (ii in 1:(n-1)) {
-    index[ii] = 
-      prod(cpi[ii:(n-1)])
-  }
-  
-  return(index)
-
-}  
-
-MultiplyCPI <- function(cpiIndex, factor) {
-  return(factor*(cpiIndex)-1 )
-}
-
-# Set-up best fit costing vectors ----------------------------------------------
-costingsBest <- paramsBest %>% 
-  select(year, inflation_index, annual_cost, lifetime_cost_0d, 
-    lifetime_cost_35d, lifetime_cost_50d) %>%
-  mutate(cumulative_index = IndexCPI(inflation_index),
-    cumulative_index2 = IndexCPI(MultiplyCPI(inflation_index, 2))) %>%
-  mutate(ac_adjusted = cumulative_index * annual_cost,
-    lc0_adjusted = cumulative_index *  lifetime_cost_0d, 
-    lc35_adjusted = cumulative_index *  lifetime_cost_35d,
-    lc50_adjusted = cumulative_index *  lifetime_cost_50d,
-    ac_adjusted2 = cumulative_index2 * annual_cost,
-    lc0_adjusted2 = cumulative_index2 *  lifetime_cost_0d, 
-    lc35_adjusted2 = cumulative_index2 *  lifetime_cost_35d,
-    lc50_adjusted2 = cumulative_index2 *  lifetime_cost_50d)
-
- # Generate parameter sets for all simulations --------------------------------
-costingSets <- list()
-  
-if (numsims > 1) {
-  
-  for (ii in 1:numsims) {
-    tempParams <- paramsSets %>% filter(simset == ii)
-    
-    tempCosts <- tempParams  %>% 
-      select(simset, year, inflation_index, annual_cost, lifetime_cost_0d, 
-        lifetime_cost_35d, lifetime_cost_50d) %>%
-      mutate(cumulative_index = IndexCPI(inflation_index),
-        cumulative_index2 = IndexCPI(MultiplyCPI(inflation_index, 2))) %>%
-      mutate(ac_adjusted = cumulative_index * annual_cost,
-        lc0_adjusted = cumulative_index *  lifetime_cost_0d, 
-        lc35_adjusted = cumulative_index *  lifetime_cost_35d,
-        lc50_adjusted = cumulative_index *  lifetime_cost_50d,
-        ac_adjusted2 = cumulative_index2 * annual_cost,
-        lc0_adjusted2 = cumulative_index2 *  lifetime_cost_0d, 
-        lc35_adjusted2 = cumulative_index2 *  lifetime_cost_35d,
-        lc50_adjusted2 = cumulative_index2 *  lifetime_cost_50d)
-    
-    costingSets <- bind_rows(costingSets, tempCosts)
-    
-  }
-  
-}
 
 ```
 
