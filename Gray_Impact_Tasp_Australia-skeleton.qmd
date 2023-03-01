@@ -86,7 +86,7 @@ currTime <- format(Sys.time(), "%y-%m-%d_%H-%M-%S") # for appending to
 # to load. This is set up so long simulation runs do not need to be repeated.
 
 # Manually enter file name tag to regenerate old results
-loadFileTag <-  NULL# "23-02-21_19-08-00_Testing" # set to NULL to run things from scratch
+loadFileTag <-  NULL #"23-02-27_22-08-14_Impact_Tasp" # set to NULL to run things from scratch
 
 if (is.null(loadFileTag)) {
   # Set to default values 
@@ -111,7 +111,7 @@ if (is.null(loadFileTag)) {
   loadParameters <- ifelse(!loadProject, FALSE, loadParameters)
   loadResults <- ifelse(!loadProject, FALSE, loadResults)
   
-  useSeed <- FALSE  # Set to true to use seed in project file else create new one  
+  useSeed <- TRUE  # Set to true to use seed in project file else create new one  
   
   saveProject <- TRUE    # save project, parameters, and results files
   
@@ -134,7 +134,7 @@ if (!loadProject) {
   # running the calculations
   
   name <- "Impact_TasP_Australia-Testing" 
-  saveFileTag <- "Impact_Tasp-v2"
+  saveFileTag <- "Impact_Tasp"
   
   startYear <- 2009 
   endYear <- 2019  
@@ -156,7 +156,8 @@ if (!loadProject) {
   projectVars <- tibble::lst(name, saveFileTag, startYear, endYear,
     indexYearART, years, nyears, numsims, currseed)
   
-  # Create parameter csv files if they don't already exist
+  # Create parameter csv files if they don't already exist - if created they are
+  # empty for user to input values
   if (!file.exists(file.path(resultsFolder, paste0(saveFileTag, 
     "_parameters_fixed.csv")))){
   
@@ -169,11 +170,15 @@ if (!loadProject) {
       "lifetime_cost_35d" = "Lifetime care and treatment cost (3.5% discounting)",
       "lifetime_cost_50d" = "Lifetime care and treatment cost (5.0% discounting)",
       "plhiv_range" = "Range in PLHIV estimates",
+      "prop_leave_range" = "Range in the percentage who leave", 
+      "prop_diagnosed_range" = "Range in proportion diagnosed", 
       "prop_art_range" = "Range in ART coverage",
       "prop_vs_range" = "Range in viral suppression estimates",
       "prop_prep_range" = "Range in PrEP coverage",
       "prop_condom_range" = "Range in condom use",
-      "inflation_index_range" = "Range in inflation index"
+      "diagnosed_os_range" = "Range in diagnoses from overseas", 
+      "diagnoses_range" = "Range in diagnoses",
+      "inflation_index_factor" = "Inflation index factor (adjustment of annual CPI)", 
     ) 
     
     paramsFixed <- tibble(
@@ -192,6 +197,7 @@ if (!loadProject) {
     paramsTime <- tibble(
       year = years,
       plhiv = rep('', nyears), 
+      prop_leave = rep('', nyears), 
       prop_diagnosed = rep('', nyears),
       prop_art = rep('', nyears),
       prop_vs = rep('', nyears),
@@ -199,7 +205,7 @@ if (!loadProject) {
       prop_condoms = rep('', nyears),
       diagnosed_os = rep('', nyears),
       diagoses = rep('', nyears),
-      inflation_index = rep('', nyears)
+      inflation = rep('', nyears)
     )
     
     write_csv(paramsTime, file.path(resultsFolder, paste0(saveFileTag, 
@@ -226,6 +232,15 @@ if (!loadProject) {
   simSpecs <- oldSimSpecs
   project$simSpecs <- simSpecs
   
+  if (useSeed) {
+    # Reset seed 
+    set.seed(currseed)
+  } else {
+    # Generate a new one
+    currseed <- sample(1:10^6, 1)
+    set.seed(currseed)
+  }
+  
 }
 
 ```
@@ -250,7 +265,8 @@ if (!loadParameters) {
     select(code_variable, estimate) %>%
     # Only need these parameters for the model the others are for setting up
     # parameter sets
-    filter(code_variable %in% c("effart", "effprep", "effcondom")) %>%
+    filter(code_variable %in% c("effart", "effprep", "effcondom", "annual_cost",
+      "lifetime_cost_0d", "lifetime_cost_35d", "lifetime_cost_50d")) %>%
     spread(code_variable, estimate) %>%
     slice(rep(row_number(), nyears)) %>%
     bind_cols(parametersVar) %>%
@@ -262,16 +278,18 @@ if (!loadParameters) {
   
   if (numsims > 1) {
     
-    # Reset seed 
-    set.seed(currseed)
+    # Parameters that are not sampled
+    paramsFixed <- c("inflation_index")
     
     # Separate the parameters into two sets those that are inputs in the 
     # model and those that are used to produce uncertainty in the time series 
     # variables. The time series variables need to be sampled twice for the
     # start and end of the time series. 
-    params2sampleOnce <- c("effart", "effprep", "effcondom")
+    params2sampleOnce <- c("effart", "effprep", "effcondom", "annual_cost",
+      "lifetime_cost_0d", "lifetime_cost_35d", "lifetime_cost_50d", 
+      "inflation_index_factor")
     params2sampletwice <- c("plhiv", "prop_leave", "prop_diagnosed", "prop_art", 
-      "prop_vs", "prop_prep", "prop_condom", "diagnoses", "diagnosed_os")  
+      "prop_vs", "prop_prep", "prop_condom", "diagnosed_os", "diagnoses") 
     
     paramsSets[["simset"]] <- rep(1:numsims, each = nyears)
     paramsSets[["year"]] <- rep(years, numsims)
@@ -290,9 +308,11 @@ if (!loadParameters) {
     # end and then connect linearly to change the best estimate values.  
     for (var in params2sampletwice) {
       
-      tempStart <-  runif(numsims,(parametersFixed %>% filter(code_variable == paste0(var, "_range")))$lower, 
+      tempStart <-  runif(numsims,(parametersFixed %>% 
+          filter(code_variable == paste0(var, "_range")))$lower, 
         (parametersFixed %>% filter(code_variable == paste0(var,"_range")))$upper)
-      tempEnd <- runif(numsims,(parametersFixed %>% filter(code_variable == paste0(var, "_range")))$lower, 
+      tempEnd <- runif(numsims,(parametersFixed %>% 
+          filter(code_variable == paste0(var, "_range")))$lower, 
         (parametersFixed %>% filter(code_variable == paste0(var, "_range")))$upper)
       
       # Update best estimate using sampled multiplicative factors for each sim
@@ -305,6 +325,10 @@ if (!loadParameters) {
         paramsSets[[var]] <- varVector
         
       }
+    }
+    
+    for (var in paramsFixed) {
+       paramsSets[[var]] <- rep(parametersVar[[var]], numsims)
     }
     
     # Convert to tibble
@@ -432,7 +456,7 @@ if (!loadResults) {
   
 } else {
   # Load results from file - resultsBest, resultsSims
-  load(file.path(resultsFolder, paste0(loadFileTag, "_parameters.Rda")))
+  load(file.path(resultsFolder, paste0(loadFileTag, "_results.Rda")))
   
 }
 
@@ -539,7 +563,7 @@ if (!loadResults) {
 } else {
   # Load results from file - resultsBest, resultsSims, 
   # resultsScenarioBest, resultsScenarioSims
-  load(file.path(resultsFolder, paste0(loadFileTag, "_parameters.Rda")))
+  load(file.path(resultsFolder, paste0(loadFileTag, "_results.Rda")))
 }
 
 ```
@@ -617,7 +641,70 @@ resultsAverted <- ggplot(data = avertedInfects, aes(x = averted)) +
 
 ```
 
-```{r Health Economic Calculations}
+```{r Health Economic Costings}
+# This chunk set-up the costs for the health economic calculations.
+
+# Functions to create cumulative inflation indices for each year
+IndexCPI <- function(cpi) {
+  
+  n <- length(cpi)
+  index <- rep(1, n)
+  
+  for (ii in 1:(n-1)) {
+    index[ii] = 
+      prod(cpi[ii:(n-1)])
+  }
+  
+  return(index)
+
+}  
+
+MultiplyCPI <- function(cpiIndex, factor) {
+  return(factor*(cpiIndex)-1 )
+}
+
+# Set-up best fit costing vectors ----------------------------------------------
+costingsBest <- paramsBest %>% 
+  select(year, inflation_index, annual_cost, lifetime_cost_0d, 
+    lifetime_cost_35d, lifetime_cost_50d) %>%
+  mutate(cumulative_index = IndexCPI(inflation_index),
+    cumulative_index2 = IndexCPI(MultiplyCPI(inflation_index, 2))) %>%
+  mutate(ac_adjusted = cumulative_index * annual_cost,
+    lc0_adjusted = cumulative_index *  lifetime_cost_0d, 
+    lc35_adjusted = cumulative_index *  lifetime_cost_35d,
+    lc50_adjusted = cumulative_index *  lifetime_cost_50d,
+    ac_adjusted2 = cumulative_index2 * annual_cost,
+    lc0_adjusted2 = cumulative_index2 *  lifetime_cost_0d, 
+    lc35_adjusted2 = cumulative_index2 *  lifetime_cost_35d,
+    lc50_adjusted2 = cumulative_index2 *  lifetime_cost_50d)
+
+ # Generate parameter sets for all simulations --------------------------------
+costingSets <- list()
+  
+if (numsims > 1) {
+  
+  for (ii in 1:numsims) {
+    tempParams <- paramsSets %>% filter(simset == ii)
+    
+    tempCosts <- tempParams  %>% 
+      select(simset, year, inflation_index, annual_cost, lifetime_cost_0d, 
+        lifetime_cost_35d, lifetime_cost_50d) %>%
+      mutate(cumulative_index = IndexCPI(inflation_index),
+        cumulative_index2 = IndexCPI(MultiplyCPI(inflation_index, 2))) %>%
+      mutate(ac_adjusted = cumulative_index * annual_cost,
+        lc0_adjusted = cumulative_index *  lifetime_cost_0d, 
+        lc35_adjusted = cumulative_index *  lifetime_cost_35d,
+        lc50_adjusted = cumulative_index *  lifetime_cost_50d,
+        ac_adjusted2 = cumulative_index2 * annual_cost,
+        lc0_adjusted2 = cumulative_index2 *  lifetime_cost_0d, 
+        lc35_adjusted2 = cumulative_index2 *  lifetime_cost_35d,
+        lc50_adjusted2 = cumulative_index2 *  lifetime_cost_50d)
+    
+    costingSets <- bind_rows(costingSets, tempCosts)
+    
+  }
+  
+}
 
 ```
 
