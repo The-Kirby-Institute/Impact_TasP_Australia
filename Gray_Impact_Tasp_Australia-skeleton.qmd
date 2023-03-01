@@ -704,7 +704,61 @@ resultsAverted <- ggplot(data = avertedInfects, aes(x = averted)) +
 ```
 
 ```{r Health Economic Calculations}
-# This chunk set-up the costs for the health economic calculations.
+# This chunk does the health economic calculations -- we apply costs to all 
+# diagnosed not just those on ART (conservative costing)
+
+HEresultsBest <- scenarioResultsBest %>% 
+  select(scenario, year, diagnosed, newInfects) %>% 
+  left_join(costingsBest, by = "year") %>%
+  select(-inflation_index, -cumulative_index, -cumulative_index2) %>%
+  mutate(
+    hc_base = diagnosed * annual_cost,
+    hc_adjusted = diagnosed * ac_adjusted,
+    hc_adjusted2 = diagnosed * ac_adjusted2,
+    lc0 = newInfects * lifetime_cost_0d,
+    lc35 = newInfects * lifetime_cost_35d,
+    lc50 = newInfects * lifetime_cost_50d,
+    lc0_adjusted = newInfects * lc0_adjusted,
+    lc35_adjusted = newInfects * lc35_adjusted,
+    lc50_adjusted = newInfects * lc50_adjusted,
+    lc0_adjusted2 = newInfects * lc0_adjusted2,
+    lc35_adjusted2 = newInfects * lc35_adjusted2,
+    lc50_adjusted2 = newInfects * lc50_adjusted2)
+
+cumHEresultsBest <- HEresultsBest %>%
+  select(-year, -diagnosed) %>%
+  group_by(scenario) %>% 
+  summarise_all(sum)
+
+HEresultsSims <- tibble()
+
+if (numsims > 1) {
+  
+  HEresultsSims <- scenarioResultsSims %>% 
+    select(scenario, simset, year, diagnosed, newInfects) %>% 
+    left_join(costingsBest, by = "year") %>%
+    select(-inflation_index, -cumulative_index, -cumulative_index2) %>%
+    mutate(
+      hc_base = diagnosed * annual_cost,
+      hc_adjusted = diagnosed * ac_adjusted,
+      hc_adjusted2 = diagnosed * ac_adjusted2,
+      lc0 = newInfects * lifetime_cost_0d,
+      lc35 = newInfects * lifetime_cost_35d,
+      lc50 = newInfects * lifetime_cost_50d,
+      lc0_adjusted = newInfects * lc0_adjusted,
+      lc35_adjusted = newInfects * lc35_adjusted,
+      lc50_adjusted = newInfects * lc50_adjusted,
+      lc0_adjusted2 = newInfects * lc0_adjusted2,
+      lc35_adjusted2 = newInfects * lc35_adjusted2,
+      lc50_adjusted2 = newInfects * lc50_adjusted2)
+
+  cumHEresultsSims <- HEresultsSims %>%
+    select(-year, -diagnosed) %>%
+    group_by(scenario, simset) %>% 
+    summarise_all(sum)
+  
+}
+
 
 
 ```
