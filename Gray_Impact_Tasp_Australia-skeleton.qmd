@@ -121,6 +121,12 @@ if (is.null(loadFileTag)) {
 simSpecs <- tibble::lst(loadFileTag, loadProject, loadParameters, loadResults, 
   useSeed, saveProject)
 
+# Results output options
+
+savePlots <- TRUE    # save plots to file
+# knitplots <- TRUE    # insert plots in the produced Rmarkdown document
+saveFormat <- ".svg" # Format for saving plots
+
 ```
 
 ```{r User specified analysis variables}
@@ -153,8 +159,8 @@ if (!loadProject) {
   currseed <- sample(1:10^6, 1)
   set.seed(currseed)
   
-  projectVars <- tibble::lst(name, saveFileTag, startYear, endYear,
-    indexYearART, years, nyears, numsims, currseed)
+  projectVars <- tibble::lst(currTime, name, saveFileTag, loadFileTag, 
+    startYear, endYear, indexYearART, years, nyears, numsims, currseed)
   
   # Create parameter csv files if they don't already exist - if created they are
   # empty for user to input values
@@ -234,7 +240,7 @@ if (!loadProject) {
   
   if (useSeed) {
     # Reset seed 
-    set.seed(currseed)
+    set.seed(project$projectVars$currseed)
   } else {
     # Generate a new one
     currseed <- sample(1:10^6, 1)
@@ -558,8 +564,6 @@ plhivPlot <- ggplot(data = resultsSims, aes(x = year, y = infected, group = sims
   xlab("Year") + ylab("Number of people with HIV") + 
   PlotOptions()
 
-plhivPlot
-
 infectionsPlot <- ggplot(data = resultsSims, aes(x = year, y = newInfects, group = simset)) + 
   geom_line(aes(colour = "sims")) +
   geom_line(data = resultsBest, aes(group = 1, colour = "best")) +
@@ -573,10 +577,17 @@ infectionsPlot <- ggplot(data = resultsSims, aes(x = year, y = newInfects, group
   xlab("Year") + ylab("Annual HIV infections") + 
   PlotOptions()
 
-infectionsPlot
-
-# TODO: save plots as PNG and append to results??
-
+if (savePlots) {
+  
+  SaveFigure(file.path(resultsFolder, "figures"), 
+    paste0("PLHIV_Validation_", loadFileTag), 
+    plhivPlot, format = saveFormat)
+  
+  SaveFigure(file.path(resultsFolder, "figures"), 
+    paste0("Infections_Validation_", loadFileTag), 
+    infectionsPlot, format = saveFormat)
+  
+}
 ```
 
 ```{r Run simulations - scenario}
@@ -703,6 +714,28 @@ resultsAverted <- ggplot(data = avertedInfects, aes(x = averted)) +
   geom_density(alpha = 0.5, fill = pc("Cornflower")) +
   xlab("Infections averted") + ylab("Density") +
   PlotOptions() + theme(legend.position = "none")  
+
+# Save plots separately --------------------------------------------------------
+
+if (savePlots) {
+  
+  SaveFigure(file.path(resultsFolder, "figures"), 
+    paste0("Scenario_PLHIV_", loadFileTag), 
+    resultsPlhiv, format = saveFormat)
+  
+  SaveFigure(file.path(resultsFolder, "figures"), 
+    paste0("Scenario_infections_", loadFileTag),
+    resultsInfects, format = saveFormat)
+  
+  SaveFigure(file.path(resultsFolder, "figures"), 
+    paste0("Scenario_cumulative_infections_", loadFileTag),
+    resultsCumInfects, format = saveFormat)
+  
+  SaveFigure(file.path(resultsFolder, "figures"), 
+    paste0("Scenario_averted_infections", loadFileTag),
+    resultsAverted, format = saveFormat)
+}
+
 
 ```
 
@@ -833,13 +866,22 @@ HEplot <- ggplot(data = barResultsBest , aes(x = indicator, y = cost / 1e6)) +
   geom_vline(aes(xintercept = 1.5), linetype = "longdash") +
   PlotOptions() + theme(legend.position = "none")
 
-HEplot
+if (savePlots) {
+  
+  SaveFigure(file.path(resultsFolder, "figures"), 
+    paste0("Scenario_HE_Results_", loadFileTag), 
+    HEplot, format = saveFormat)
+  
+}
 
 ```
 
 
 
-```{r Save project and output}
+```{r Save paper output}
+# Create and sabe the final plot and tables for the manuscript
+
+
 
 ```
 
