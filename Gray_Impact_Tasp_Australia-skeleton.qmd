@@ -86,7 +86,7 @@ currTime <- format(Sys.time(), "%y-%m-%d_%H-%M-%S") # for appending to
 # to load. This is set up so long simulation runs do not need to be repeated.
 
 # Manually enter file name tag to regenerate old results
-loadFileTag <-  NULL #"23-02-27_22-08-14_Impact_Tasp" # set to NULL to run things from scratch
+loadFileTag <-  "23-03-01_14-33-59_Impact_Tasp" # set to NULL to run things from scratch
 
 if (is.null(loadFileTag)) {
   # Set to default values 
@@ -396,15 +396,15 @@ if (!loadParameters) {
       costingSets <- bind_rows(costingSets, tempCosts)
       
     }
-} # Else paramsSets and costingSets are NULL
-
-# Save parameters in a separate file
-if (saveProject) {
-  save(paramsBest, paramsSets, costingsBest, costingSets, 
-    file = file.path(resultsFolder, 
-      paste0(currTime, "_", saveFileTag, "_parameters.Rda")))
-}
-
+  } # Else paramsSets and costingSets are NULL
+  
+  # Save parameters in a separate file
+  if (saveProject) {
+    save(paramsBest, paramsSets, costingsBest, costingSets, 
+      file = file.path(resultsFolder, 
+        paste0(currTime, "_", saveFileTag, "_parameters.Rda")))
+  }
+  
 } else {
   # Load parmaeter sets from file - paramsBest, paramsSets
   load(file.path(resultsFolder, paste0(loadFileTag, "_parameters.Rda")))
@@ -630,9 +630,9 @@ if (!loadResults) {
 
 ```
 
-```{r Analyse results and generate plots}
+```{r Analyse epi results and generate plots}
 
-# Organize results for plotting ------------------------------------------------
+# Organize results for analysis and plotting------------------------------------
 scenarioResultsBest <- (resultsBest %>% mutate(scenario = "base")) %>%
   bind_rows(resultsScenarioBest %>% mutate(scenario = "scenario")) %>%
   select(scenario, year, everything())
@@ -641,13 +641,16 @@ scenarioResultsSims <- (resultsSims %>% mutate(scenario = "base")) %>%
   bind_rows(resultsScenarioSims %>% mutate(scenario = "scenario")) %>%
   select(scenario, simset, year, everything())
 
+# Generate plots ---------------------------------------------------------------
 resultsPlhiv <- ggplot(data = scenarioResultsSims, aes(x = year, y = infected, 
-  colour = scenario, group = interaction(scenario, simset))) + 
-  geom_line() + 
+  colour = scenario, fill = scenario, group = interaction(scenario, simset))) + 
+  geom_line() +
+  # geom_ribbon(aes(ymin = quantile(infected, 0.025), 
+  #   ymax = quantile(infected, 0.975))) + 
   geom_line(data = (scenarioResultsBest %>% filter(scenario == "base")), 
-    aes(group = 1), colour = pc("Blue")) +
+    aes(group = 1), colour = pc("Blue"), size = 1.1) +
   geom_line(data = (scenarioResultsBest %>% filter(scenario == "scenario")), 
-    aes(group = 1), colour = pc("Black")) +
+    aes(group = 1), colour = pc("Black"), size = 1.1) +
   expand_limits(y = c(0, NA)) + 
   scale_x_continuous(breaks = seq(2009, 2019, by = 2)) + 
   scale_colour_manual(name = "", 
@@ -661,9 +664,9 @@ resultsInfects <- ggplot(data = scenarioResultsSims, aes(x = year, y = newInfect
   colour = scenario, group = interaction(scenario, simset))) + 
   geom_line() + 
   geom_line(data = (scenarioResultsBest %>% filter(scenario == "base")), 
-    aes(group = 1), colour = pc("Blue")) +
+    aes(group = 1), colour = pc("Blue"), size = 1.1) +
   geom_line(data = (scenarioResultsBest %>% filter(scenario == "scenario")), 
-    aes(group = 1), colour = pc("Black")) +
+    aes(group = 1), colour = pc("Black"), size = 1.1) +
   expand_limits(y = c(0, NA)) + 
   scale_x_continuous(breaks = seq(2009, 2019, by = 2)) + 
   scale_colour_manual(name = "", 
@@ -707,41 +710,15 @@ resultsAverted <- ggplot(data = avertedInfects, aes(x = averted)) +
 # This chunk does the health economic calculations -- we apply costs to all 
 # diagnosed not just those on ART (conservative costing)
 
-HEresultsBest <- scenarioResultsBest %>% 
-  select(scenario, year, diagnosed, newInfects) %>% 
-  left_join(costingsBest, by = "year") %>%
-  select(-inflation_index, -cumulative_index, -cumulative_index2) %>%
-  mutate(
-    hc_base = diagnosed * annual_cost,
-    hc_adjusted = diagnosed * ac_adjusted,
-    hc_adjusted2 = diagnosed * ac_adjusted2,
-    lc0 = newInfects * lifetime_cost_0d,
-    lc35 = newInfects * lifetime_cost_35d,
-    lc50 = newInfects * lifetime_cost_50d,
-    lc0_adjusted = newInfects * lc0_adjusted,
-    lc35_adjusted = newInfects * lc35_adjusted,
-    lc50_adjusted = newInfects * lc50_adjusted,
-    lc0_adjusted2 = newInfects * lc0_adjusted2,
-    lc35_adjusted2 = newInfects * lc35_adjusted2,
-    lc50_adjusted2 = newInfects * lc50_adjusted2)
+if (!loadResults) {
 
-cumHEresultsBest <- HEresultsBest %>%
-  select(-year, -diagnosed) %>%
-  group_by(scenario) %>% 
-  summarise_all(sum)
-
-HEresultsSims <- tibble()
-
-if (numsims > 1) {
-  
-  HEresultsSims <- scenarioResultsSims %>% 
-    select(scenario, simset, year, diagnosed, newInfects) %>% 
-    left_join(costingsBest, by = "year") %>%
-    select(-inflation_index, -cumulative_index, -cumulative_index2) %>%
+  HEresultsBest <- scenarioResultsBest %>% 
+    select(scenario, year, numArt, newInfects) %>% 
+    left_join(costingsBest, by = "year") %>% # Duplicate for both scenarios 
     mutate(
-      hc_base = diagnosed * annual_cost,
-      hc_adjusted = diagnosed * ac_adjusted,
-      hc_adjusted2 = diagnosed * ac_adjusted2,
+      hc_base = numArt * annual_cost,
+      hc_adjusted = numArt * ac_adjusted,
+      hc_adjusted2 = numArt * ac_adjusted2,
       lc0 = newInfects * lifetime_cost_0d,
       lc35 = newInfects * lifetime_cost_35d,
       lc50 = newInfects * lifetime_cost_50d,
@@ -750,18 +727,116 @@ if (numsims > 1) {
       lc50_adjusted = newInfects * lc50_adjusted,
       lc0_adjusted2 = newInfects * lc0_adjusted2,
       lc35_adjusted2 = newInfects * lc35_adjusted2,
-      lc50_adjusted2 = newInfects * lc50_adjusted2)
-
-  cumHEresultsSims <- HEresultsSims %>%
-    select(-year, -diagnosed) %>%
-    group_by(scenario, simset) %>% 
+      lc50_adjusted2 = newInfects * lc50_adjusted2) %>%
+    select(scenario, year, numArt, newInfects, contains("hc"),
+      contains("lc")) 
+  
+  cumHEresultsBest <- HEresultsBest %>%
+    select(-year, -numArt) %>%
+    group_by(scenario) %>% 
     summarise_all(sum)
   
+  HEresultsSims <- tibble()
+  cumHEresultsSims <- tibble()
+  
+  if (numsims > 1) {
+    
+    HEresultsSims <- scenarioResultsSims %>% 
+      select(scenario, simset, year, numArt, newInfects) %>% 
+      left_join(costingsBest, by = "year") %>% # Duplicate for both scenarios
+      mutate(
+        hc_base = numArt * annual_cost,
+        hc_adjusted = numArt * ac_adjusted,
+        hc_adjusted2 = numArt * ac_adjusted2,
+        lc0 = newInfects * lifetime_cost_0d,
+        lc35 = newInfects * lifetime_cost_35d,
+        lc50 = newInfects * lifetime_cost_50d,
+        lc0_adjusted = newInfects * lc0_adjusted,
+        lc35_adjusted = newInfects * lc35_adjusted,
+        lc50_adjusted = newInfects * lc50_adjusted,
+        lc0_adjusted2 = newInfects * lc0_adjusted2,
+        lc35_adjusted2 = newInfects * lc35_adjusted2,
+        lc50_adjusted2 = newInfects * lc50_adjusted2) %>%
+      select(scenario, simset, year, numArt, newInfects, contains("hc"),
+        contains("lc")) 
+    
+    cumHEresultsSims <- HEresultsSims %>%
+      select(-year, -numArt) %>%
+      group_by(scenario, simset) %>% 
+      summarise_all(sum)
+    
+  }
+  
+  # Save parameters in a separate file
+  if (saveProject) {
+    save(resultsBest, resultsSims, resultsScenarioBest, resultsScenarioSims, 
+      HEresultsBest, cumHEresultsBest, HEresultsSims, cumHEresultsSims, 
+      file = file.path(resultsFolder, paste0(currTime, "_", saveFileTag, 
+        "_results.Rda")))
+  }
+  
+} else {
+  # Load results from file - resultsBest, resultsSims, 
+  # resultsScenarioBest, resultsScenarioSims
+  load(file.path(resultsFolder, paste0(loadFileTag, "_results.Rda")))
 }
 
+```
 
+```{r Health economic plots}
+# Health economics bar charts --------------------------------------------------
+
+# Set-up results for plot
+barResultsBest <- cumHEresultsBest %>%
+  select(hc_adjusted, lc0_adjusted, lc35_adjusted, lc50_adjusted) %>%
+  summarise(hc_extra = -diff(hc_adjusted),
+    lc0= diff(lc0_adjusted),
+    lc35 = diff(lc35_adjusted),
+    lc50 = diff(lc50_adjusted)) %>%
+  gather("indicator", "cost", 1:4)
+
+barResultsSims <- cumHEresultsSims %>% 
+  select(simset, hc_adjusted, lc0_adjusted, lc35_adjusted, 
+    lc50_adjusted) %>%
+  group_by(simset) %>%
+  mutate(hc_extra = -diff(hc_adjusted),
+    lc0= diff(lc0_adjusted),
+    lc35 = diff(lc35_adjusted),
+    lc50 = diff(lc50_adjusted)) %>%
+  ungroup() %>% 
+  select(hc_extra, lc0, lc35, lc50) %>%
+  gather("indicator", "cost", 1:4) %>%
+  group_by(indicator) %>%
+  summarise(mean = mean(cost),
+    median = median(cost),
+    min = min(cost),
+    max = max(cost),
+    iqr_lower = quantile(cost, 0.25),
+    iqr_upper = quantile(cost, 0.75),
+    lower95 = quantile(cost, 0.025),
+    upper95 = quantile(cost, 0.975))
+
+HEplot <- ggplot(data = barResultsBest , aes(x = indicator, y = cost / 1e6)) +
+  geom_col(aes(fill = indicator), width = 0.5, alpha = 0.5) +
+  geom_errorbar(data = barResultsSims, aes(y = median / 1e6, 
+    ymin = lower95 / 1e6, ymax = upper95 / 1e6),
+    colour = "black", width = 0.25, size = 1.1) + 
+  scale_fill_manual(name = "",
+    values = c(pc("Gray"), pc("Cornflower"), pc("Cornflower"),
+    pc("Cornflower"))) +
+  xlab("") + ylab("Millions AUD") +
+  scale_x_discrete(labels = c("Additional\ntreatment\ncosts",
+    "Reduction\n in lifetime\nHIV costs\n(no discounting)",
+    "Reduction\n in lifetime\nHIV costs\n(3.5% discounting)",
+    "Reduction\n in lifetime\nHIV costs\n(5% discounting)")) +
+  ylim(0, 1200) +
+  geom_vline(aes(xintercept = 1.5), linetype = "longdash") +
+  PlotOptions() + theme(legend.position = "none")
+
+HEplot
 
 ```
+
 
 
 ```{r Save project and output}
