@@ -54,8 +54,9 @@ Skeleton of the Impact of U=U paper. Only a simple model is used so this Quarto
 document contains the code and results generation. The majority of the
 manuscript is written here to enable results to be inserted. The write-up of the
 results for the abstract is done at the start of the Results section. Final
-editing needs to be completed (such as moving the abstract results) in the
-resulting Word Document file to finalise the manuscript.
+editing needs to be completed in the resulting Word Document file to finalise
+the manuscript. This includes moving the abstract results and formatting the 
+time varying parameters in Table 2. 
 
 <!--- The following code chunks set up the model and results generation for the paper--->
 
@@ -73,8 +74,11 @@ resulting Word Document file to finalise the manuscript.
 # Load standard libraries and options
 library(tidyverse)
 library(LeftysRpkg)
+library(scales)
+library(cowplot) # Note this masks ggsave with save_plot
 library(captioner)
-library(knitr)
+library(stringr)
+library(svglite)
 
 # Set-up directories
 basePath <- getwd() 
@@ -587,8 +591,6 @@ knitr::kable(table2, row.names = FALSE,
   caption = "Caption for cross-ref delete {#tbl-table2}")
 ```
 
-
-
 ## Results
 
 ```{r Run simulations - baseline}
@@ -986,7 +988,20 @@ if (savePlots) {
 ```{r Save paper output}
 # Create and save the final plot and tables for the manuscript
 
+# Create a combination plot for manuscript -------------------------------------
+combinedPlot <- plot_grid(resultsPlhiv, resultsInfects, resultsCumInfects, HEplot,
+   ncol = 2, nrow = 2, align = "v", labels = c("A", "B", "C", "D"))
 
+
+if (savePlots) {
+  
+  SaveFigure(file.path(resultsFolder, "figures"), 
+    paste0("Combined_Figure_", loadFileTag), 
+    combinedPlot, format = saveFormat, 
+    width = figWidth, height = figWidth, units = "in")
+}
+
+# Create a formatted summary results table for manuscript ----------------------
 
 ```
 
