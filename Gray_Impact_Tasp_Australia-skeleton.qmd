@@ -740,7 +740,7 @@ if (!loadResults) {
   # Save parameters in a separate file
   if (saveProject) {
     save(resultsBest, resultsSims, resultsScenarioBest, resultsScenarioSims, 
-      file = file.path(resultsFolder, paste0(saveFileTag, "_results.Rda")))
+      file = file.path(resultsFolder, paste0(loadFileTag, "_results.Rda")))
   }
   
 } else {
@@ -1001,6 +1001,8 @@ if (savePlots) {
     width = figWidth, height = figWidth, units = "in")
 }
 
+combinedPlotCaption <- ""
+
 # Create a formatted summary results table for manuscript ----------------------
 
 lprob <- 0.025 # lower and upper probs for quantile function
@@ -1103,6 +1105,47 @@ if (savePlots) {
   
 }
 
+summaryTableCaption <- ""
+
+# Create a scenario table for the HE results -----------------------------------
+costSummaryTable <- tibble(
+  "Cost indicator" = character(4),
+  "No inflation" = character(4),
+  "Observed CPI" = character(4),
+  "Double CPI" = character(4)) 
+
+costSummaryTable[["Cost indicator"]] <- c("Additional treatment costs",
+  "Reduction in lifetime HIV costs (no discounting)", 
+  "Reduction in lifetime HIV costs (3.5% discounting)",
+  "Reduction in lifetime HIV costs (5% discounting)")
+
+costSummaryTable[["No inflation"]] <- c(
+  FormatCostDiffs("hc_base", flip = -1, scale = 6),
+  FormatCostDiffs("lc0", scale = 6),
+  FormatCostDiffs("lc35", scale = 6),
+  FormatCostDiffs("lc50", scale = 6))
+
+costSummaryTable[["Observed CPI"]] <- c(
+  FormatCostDiffs("hc_adjusted", flip = -1, scale = 6),
+  FormatCostDiffs("lc0_adjusted", scale = 6),
+  FormatCostDiffs("lc35_adjusted", scale = 6),
+  FormatCostDiffs("lc50_adjusted", scale = 6))
+
+costSummaryTable[["Double CPI"]] <- c(
+  FormatCostDiffs("hc_adjusted2", flip = -1, scale = 6),
+  FormatCostDiffs("lc0_adjusted2", scale = 6),
+  FormatCostDiffs("lc35_adjusted2", scale = 6),
+  FormatCostDiffs("lc50_adjusted2", scale = 6))
+
+if (savePlots) {
+  
+  write_csv(costSummaryTable, file.path(resultsFolder, "figures", 
+    paste0("Summary_costs_", loadFileTag, ".csv")))
+  
+}
+
+costTableCaption <- ""
+
 ```
 
 **Abstract Results**:
@@ -1114,3 +1157,45 @@ if (savePlots) {
 ## Conflicts of Interest
 
 ## Acknowledgements
+
+\newpage
+
+## Tables
+
+<!--- Inserted using code chunks and the loaded results --->
+
+```{r Table 3}
+#| label: tbl-table1
+#| tbl-cap: !expr summaryTableCaption 
+#| tbl-cap-location: top # Doesn't seem to work
+#| include: true
+#| output: asis
+knitr::kable(summaryTable, row.names = FALSE, 
+  caption = "Caption for cross-ref delete {#tbl-table3}")
+```
+
+\newpage
+
+```{r Table 4}
+#| label: tbl-table1
+#| tbl-cap: !expr costTableCaption 
+#| tbl-cap-location: top # Doesn't seem to work
+#| include: true
+#| output: asis
+knitr::kable(costSummaryTable, row.names = FALSE, 
+  caption = "Caption for cross-ref delete {#tbl-table4}")
+```
+
+## Figures and Figure Legends
+
+<!--- Inserted using code chunks and the loaded results --->
+
+```{r Figure 1}
+#| label: fig-figure1
+#| include: true
+#| fig-cap: !expr combinedPlotCaption
+#| fig-cap-location: top # Doesn't seem to work
+#| fig-width: !expr figWidth
+#| fig-height: !expr 2*figRowWidth
+print(combinedPlot)
+```
