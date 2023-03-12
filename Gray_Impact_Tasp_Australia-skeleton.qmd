@@ -47,15 +47,25 @@ Current draft produced `r format(Sys.Date(), format="%B %d, %Y")`.
 -   Word count abstract:
 -   Word count main text:
 -   References:
--   Figures:
--   Tables:
+-   Figures: 1
+-   Tables: 4
 
 Skeleton of the Impact of U=U paper. Only a simple model is used so this Quarto
-document contains the code and results generation. Things that need to be fixed
-in the corresponding Word document are in bold. References are not added here
-but the locations for references are in bold.
+document contains the code and results generation. The majority of the
+manuscript is written here to enable results to be inserted. The write-up of the
+results for the abstract is done at the start of the Results section. Final
+editing needs to be completed (such as moving the abstract results) in the
+resulting Word Document file to finalise the manuscript.
 
 <!--- The following code chunks set up the model and results generation for the paper--->
+
+\newpage
+
+## Abstract.
+
+**Background**: **Methods**: **Results**: **Conclusions**:
+
+## Introduction
 
 ```{r Set-up}
 # Open as a project (setting working directory to source and restarting R)
@@ -86,7 +96,7 @@ currTime <- format(Sys.time(), "%y-%m-%d_%H-%M-%S") # for appending to
 # to load. This is set up so long simulation runs do not need to be repeated.
 
 # Manually enter file name tag to regenerate old results
-loadFileTag <-  "23-03-01_14-33-59_Impact_Tasp" # set to NULL to run things from scratch
+loadFileTag <-NULL # "23-03-01_14-33-59_Impact_Tasp" # set to NULL to run things from scratch
 
 if (is.null(loadFileTag)) {
   # Set to default values 
@@ -248,8 +258,10 @@ if (!loadProject) {
   }
   
 }
-
 ```
+
+
+## Methods
 
 ```{r Useful functions}
 # This chunk sources useful functions for the set-up and analysis
@@ -274,6 +286,37 @@ MultiplyCPI <- function(cpiIndex, factor) {
   return(factor*(cpiIndex)-1 )
 }
 
+# Define some useful functions for formatting results
+decimalMark <- "low" 
+
+FormatRange <- function(value, low, up, places = 0) {
+    FormatData(value, places = places, lower = low, upper = up, 
+      rangestr = "range: ")
+} 
+
+FormatRangeDecimal <- function(value, low, up, places = 1) {
+  FormatData(value, lower = low, upper = up, places = places, 
+    rangestr = "range: ", decimal = decimalMark)
+}
+
+FormatRangePercent <- function(value, low, up, places = 1) {
+  FormatData(value, lower = low, upper = up, places = places, 
+    suffix = "%", rangestr = "range: ", decimal = decimalMark)
+}
+
+Format95 <- function(value, low, up, places = 2) {
+  FormatData(value, lower = low, upper = up, rangestr = "95% CI: ", 
+    places = places, decimal = decimalMark)
+}
+  
+FormatPercent <- function(value, places = 2) {
+  FormatData(value, suffix = "%", places = places, decimal = decimalMark)
+}
+
+FormatDecimal <- function(value, places = 2) {
+  FormatData(value, places = places, decimal = decimalMark)
+}
+
 ```
 
 ```{r Parameters set-up}
@@ -286,9 +329,9 @@ MultiplyCPI <- function(cpiIndex, factor) {
 if (!loadParameters) {
   
   # Read in parameter files
-  parametersFixed <- read_csv(file.path(resultsFolder, paste0(saveFileTag, 
+  parametersFixed <- read_csv(file.path(resultsFolder, paste0(saveFileTag,
     "_parameters_fixed.csv")))
-  parametersVar <- read_csv(file.path(resultsFolder, paste0(saveFileTag, 
+  parametersVar <- read_csv(file.path(resultsFolder, paste0(saveFileTag,
     "_parameters_variable.csv")))
   
   # Set-up best fit parameters -------------------------------------------------
@@ -326,7 +369,7 @@ if (!loadParameters) {
   if (numsims > 1) {
     
     # Parameters that are not sampled
-    paramsFixed <- c("inflation_index")
+    paramsCertain <- c("inflation_index")
     
     # Separate the parameters into two sets those that are inputs in the 
     # model and those that are used to produce uncertainty in the time series 
@@ -374,7 +417,7 @@ if (!loadParameters) {
       }
     }
     
-    for (var in paramsFixed) {
+    for (var in paramsCertain) {
       paramsSets[[var]] <- rep(parametersVar[[var]], numsims)
     }
     
@@ -406,8 +449,8 @@ if (!loadParameters) {
   
   # Save parameters in a separate file
   if (saveProject) {
-    save(paramsBest, paramsSets, costingsBest, costingSets, 
-      file = file.path(resultsFolder, 
+    save(parametersFixed, parametersVar, paramsBest, paramsSets, costingsBest, 
+      costingSets, file = file.path(resultsFolder, 
         paste0(currTime, "_", saveFileTag, "_parameters.Rda")))
   }
   
@@ -421,7 +464,7 @@ if (!loadParameters) {
 ```{r Analysis functions}
 # This functions and the key functions used for the analysis. 
 
-# Mian function ----------------------------------------------------------------
+# Main function ----------------------------------------------------------------
 # This is the main function for the analysis calculating the number of new
 # infections for a given year from the input data
 NewInfections <- function(plhiv, beta, propdiag, propart, propvs, effart, 
@@ -488,6 +531,66 @@ simulate <- function(numyears, paramsDf) {
 
 ```
 
+**Table 1** - Fixed input parameter estimates and ranges. Endnotes provide
+justifications for these parameter values. The simulations used for the
+calculations take samples from these ranges assuming a uniform distribution. 
+
+Parameter | Description | Estimate and Range | Notes
+----------|-------------|--------------------|-----------
+$N(0)$ | Number of people living with HIV in 2009 | `r FormatData(parametersVar$plhiv[1], parametersVar$plhiv[1]*(parametersFixed %>% filter(code_variable == "plhiv_range"))$lower, parametersVar$plhiv[1]*(parametersFixed %>% filter(code_variable == "plhiv_range"))$upper, places = 0)` | 1
+**HIV transmission parameters**
+$\beta$ | Annual probability an untreated person transmits HIV to another person | Calculated using initial values | 2  
+$\epsilon_{ART}$ | Efficacy of ART in preventing HIV transmission if virus is suppressed | `r FormatData((parametersFixed %>% filter(code_variable == "effart"))$estimate, (parametersFixed %>% filter(code_variable == "effart"))$lower, (parametersFixed %>% filter(code_variable == "effart"))$upper)` | 3
+$\epsilon_{PrEP}$ | Efficacy of PrEP in preventing HIV transmission | `r FormatData((parametersFixed %>% filter(code_variable == "effprep"))$estimate, (parametersFixed %>% filter(code_variable == "effprep"))$lower, (parametersFixed %>% filter(code_variable == "effprep"))$upper)`| 4
+$\epsilon_{condom}$ | Efficacy of condoms in preventing HIV transmission | `r FormatData((parametersFixed %>% filter(code_variable == "effcondom"))$estimate, (parametersFixed %>% filter(code_variable == "effcondom"))$lower, (parametersFixed %>% filter(code_variable == "effcondom"))$upper)`| 5
+**HIV treatment costs**
+$c_{ART}$ | Average annual cost of providing care and ART in 2019 AUD | `r FormatData((parametersFixed %>% filter(code_variable == "annual_cost"))$estimate, (parametersFixed %>% filter(code_variable == "annual_cost"))$lower, (parametersFixed %>% filter(code_variable == "annual_cost"))$upper, places = 0, prefix = "$")` | 6  
+$c^0_{life}$ | Undiscounted lifetime cost of providing care and ART post infection in 2019 AUD | `r FormatData((parametersFixed %>% filter(code_variable == "lifetime_cost_0d"))$estimate, (parametersFixed %>% filter(code_variable == "lifetime_cost_0d"))$lower, (parametersFixed %>% filter(code_variable == "lifetime_cost_0d"))$upper, places = 0, prefix = "$")` | 7 
+$c^{3.5}_{life}$ | Lifetime cost of providing care and ART post infection in 2019 AUD discounted 3.5% | `r FormatData((parametersFixed %>% filter(code_variable == "lifetime_cost_35d"))$estimate, (parametersFixed %>% filter(code_variable == "lifetime_cost_35d"))$lower, (parametersFixed %>% filter(code_variable == "lifetime_cost_35d"))$upper, places = 0, prefix = "$")` | 7 
+$c^5_{life}$ | Lifetime cost of providing care and ART post infection in 2019 AUD discounted 5%| `r FormatData((parametersFixed %>% filter(code_variable == "lifetime_cost_50d"))$estimate, (parametersFixed %>% filter(code_variable == "lifetime_cost_50d"))$lower, (parametersFixed %>% filter(code_variable == "lifetime_cost_50d"))$upper, places = 0, prefix = "$")` | 7
+
+1. 
+
+2.
+
+3.
+
+4.
+
+5.
+
+6.
+
+7.
+
+<!--- Manipulate the time varying parameters into a table--->
+```{r Format time varying parameters}
+table2 <- parametersVar %>%
+  gather(key = var_name, value = value, 2:ncol(.)) %>% 
+  spread(key = names(.)[1],value = 'value') %>%
+  mutate("Assumed uncertainty range" = NA,
+    "References" = NA) 
+
+table2Caption <- "Time varying input parameter estimates. Endnotes provide
+references and justifications. The values for PLHIV and diagnoses are not used in
+the calculations, rather they are used for validation."
+
+```
+
+```{r Table2}
+#| label: tbl-table2
+#| tbl-cap: !expr table2Caption 
+#| tbl-cap-location: top # Doesn't seem to work
+#| include: true
+#| output: asis
+knitr::kable(table2, row.names = FALSE, 
+  caption = "Caption for cross-ref delete {#tbl-table2}")
+```
+
+
+
+## Results
+
 ```{r Run simulations - baseline}
 
 if (!loadResults) {
@@ -541,6 +644,10 @@ plotcols <- c(Black = "#000000", Gray = "#95918c", Blue = "#1f75fe",
 
 # Function to extract hex values
 pc <- function(col) unname(plotcols[col])
+
+# Set up figure sizes in document - in inches for Knitr chunk headers
+figWidth <- 22/2.5
+# figRowWidth <- 8/2.5
 
 ```
 
@@ -876,13 +983,19 @@ if (savePlots) {
 
 ```
 
-
-
 ```{r Save paper output}
-# Create and sabe the final plot and tables for the manuscript
+# Create and save the final plot and tables for the manuscript
 
 
 
 ```
 
+**Abstract Results**:
 
+**Main results**
+
+## Discussion
+
+## Conflicts of Interest
+
+## Acknowledgements
