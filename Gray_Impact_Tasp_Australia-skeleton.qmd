@@ -156,6 +156,8 @@ if (!loadProject) {
   name <- "Impact_TasP_Australia-Testing" 
   saveFileTag <- "Impact_Tasp"
   
+  loadFileTag <- paste0(currTime, "_", saveFileTag)
+  
   startYear <- 2009 
   endYear <- 2019  
   
@@ -237,7 +239,8 @@ if (!loadProject) {
   project <- tibble::lst(currTime, simSpecs, projectVars)
   
   if (saveProject) {
-    save(project, file = file.path(resultsFolder, paste0(currTime, "_", saveFileTag, "_project.Rda")))
+    save(project, file = file.path(resultsFolder, 
+      paste0(loadFileTag, "_project.Rda")))
   }
   
 } else {
@@ -264,7 +267,6 @@ if (!loadProject) {
 }
 ```
 
-
 ## Methods
 
 ```{r Useful functions}
@@ -290,7 +292,7 @@ MultiplyCPI <- function(cpiIndex, factor) {
   return(factor*(cpiIndex)-1 )
 }
 
-# Define some useful functions for formatting results
+# Define some useful functions for formatting results---------------------------
 decimalMark <- "low" 
 
 FormatRange <- function(value, low, up, places = 0) {
@@ -455,7 +457,7 @@ if (!loadParameters) {
   if (saveProject) {
     save(parametersFixed, parametersVar, paramsBest, paramsSets, costingsBest, 
       costingSets, file = file.path(resultsFolder, 
-        paste0(currTime, "_", saveFileTag, "_parameters.Rda")))
+        paste0(loadFileTag, "_parameters.Rda")))
   }
   
 } else {
@@ -625,7 +627,7 @@ if (!loadResults) {
   # Save parameters in a separate file
   if (saveProject) {
     save(resultsBest, resultsSims, file = file.path(resultsFolder, 
-      paste0(currTime, "_", saveFileTag, "_results.Rda")))
+      paste0(loadFileTag, "_results.Rda")))
   }
   
 } else {
@@ -738,8 +740,7 @@ if (!loadResults) {
   # Save parameters in a separate file
   if (saveProject) {
     save(resultsBest, resultsSims, resultsScenarioBest, resultsScenarioSims, 
-      file = file.path(resultsFolder, paste0(currTime, "_", saveFileTag, 
-        "_results.Rda")))
+      file = file.path(resultsFolder, paste0(saveFileTag, "_results.Rda")))
   }
   
 } else {
@@ -913,8 +914,7 @@ if (!loadResults) {
   if (saveProject) {
     save(resultsBest, resultsSims, resultsScenarioBest, resultsScenarioSims, 
       HEresultsBest, cumHEresultsBest, HEresultsSims, cumHEresultsSims, 
-      file = file.path(resultsFolder, paste0(currTime, "_", saveFileTag, 
-        "_results.Rda")))
+      file = file.path(resultsFolder, paste0(loadFileTag, "_results.Rda")))
   }
   
 } else {
@@ -1002,6 +1002,106 @@ if (savePlots) {
 }
 
 # Create a formatted summary results table for manuscript ----------------------
+
+lprob <- 0.025 # lower and upper probs for quantile function
+uprob <- 0.975
+
+# Functions to simply table generation
+Format2019 <- function(option, indicator, digits = 0) {
+  FormatData(
+    (scenarioResultsBest %>% filter(scenario == option, year == 2019))[[indicator]], 
+    quantile((scenarioResultsSims %>% filter(scenario == option, year == 2019))[[indicator]], 
+      probs = lprob), 
+    quantile((scenarioResultsSims %>% filter(scenario == option, year == 2019))[[indicator]], 
+      probs = uprob),
+    places = digits)
+}
+
+FormatCumulative <- function(option, digits = 0) {
+  FormatData(
+    (scenarioResultsBest %>% filter(scenario == option))$newInfects %>% sum(), 
+    quantile(avertedInfects[[option]], probs = lprob), 
+    quantile(avertedInfects[[option]], probs = uprob),
+    places = digits)
+}
+
+FormatCosts <- function(option, indicator, digits = 0, scale = 0){
+  FormatData(
+    (cumHEresultsBest %>% filter(scenario == option))[[indicator]] / (10^scale),
+    quantile((cumHEresultsSims %>% filter(scenario == option))[[indicator]] / (10^scale), 
+      probs = lprob), 
+    quantile((cumHEresultsSims %>% filter(scenario == option))[[indicator]] / (10^scale), 
+      probs = uprob),
+    places = digits, prefix = "$")
+}
+
+# Calculate cost differences 
+costDifferences <- cumHEresultsSims %>%
+  group_by(simset) %>%
+  select(-scenario) %>%
+  summarise(across(everything(), diff)) %>%
+  ungroup() %>%
+  select(-simset)
+
+FormatCostDiffs <- function(indicator, digits = 0, scale = 0, flip = 1){
+  FormatData(
+    flip * (cumHEresultsBest %>% filter(scenario == "scenario"))[[indicator]] / (10^scale) -
+      flip * (cumHEresultsBest %>% filter(scenario == "base"))[[indicator]] / (10^scale),
+    quantile(flip * costDifferences[[indicator]] / (10^scale), probs = lprob), 
+    quantile(flip * costDifferences[[indicator]] / (10^scale), probs = uprob),
+    places = digits, prefix = "$")
+}
+
+# Create summary results table -------------------------------------------------
+summaryTable <- tibble(Indicator = character(),
+  status_quo =  character(),
+  counterfactual = character()) %>%
+   bind_rows(tibble(
+    Indicator = "People with HIV in 2019",
+    status_quo = Format2019("base", "infected"), 
+    counterfactual = Format2019("scenario", "infected"))) %>%
+  bind_rows(tibble(
+    Indicator = "New infections in 2019",
+    status_quo = Format2019("base", "newInfects"), 
+    counterfactual = Format2019("scenario", "newInfects"))) %>%
+  bind_rows(tibble(
+    Indicator = "Cumulative infections",
+    status_quo = FormatCumulative("base"), 
+    counterfactual = FormatCumulative("scenario"))) %>%
+  bind_rows(tibble(
+    Indicator = "Infections averted",
+    status_quo =  FormatData(
+    (scenarioResultsBest %>% filter(scenario == "scenario"))$newInfects %>% sum() - 
+         (scenarioResultsBest %>% filter(scenario == "base"))$newInfects %>% sum(), 
+    quantile(avertedInfects$averted, probs = lprob), 
+    quantile(avertedInfects$averted, probs = uprob),
+    places = 0), 
+    counterfactual = NA)) %>%
+  bind_rows(tibble(
+    Indicator = "Total treatment costs (inflated by CPI)", 
+    status_quo = FormatCosts("base", "hc_adjusted", scale = 6),
+    counterfactual = FormatCosts("scenario", "hc_adjusted", scale = 6))) %>%
+  bind_rows(tibble(
+    Indicator = "Additional Treatment costs (inflated by CPI)", 
+    status_quo = FormatCostDiffs("hc_adjusted", flip = -1, scale = 6),
+    counterfactual = NA)) %>%
+  bind_rows(tibble(
+    Indicator = "Lifetime HIV care and treatment costs (discounted 3.5%)", 
+    status_quo = FormatCosts("base", "lc35_adjusted", scale = 6),
+    counterfactual = FormatCosts("scenario", "lc35_adjusted", scale = 6))) %>%
+  bind_rows(tibble(
+    Indicator = "Reduction in HIV care and treatment costs (discounted 3.5%)", 
+    status_quo = FormatCostDiffs("lc35_adjusted", flip = -1, scale = 6),
+    counterfactual = NA)) %>%
+  # Reorganize columns and rename
+  select(Indicator, "No ART increase" = counterfactual, "Status-quo (U=U era)" = status_quo)
+
+if (savePlots) {
+  
+  write_csv(summaryTable, file.path(resultsFolder, "figures", 
+    paste0("Summary_Results_", loadFileTag, ".csv")))
+  
+}
 
 ```
 
