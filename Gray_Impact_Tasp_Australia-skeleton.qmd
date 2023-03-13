@@ -208,7 +208,6 @@ if (!loadProject) {
       "lifetime_cost_35d" = "Lifetime care and treatment cost (3.5% discounting)",
       "lifetime_cost_50d" = "Lifetime care and treatment cost (5.0% discounting)",
       "plhiv_range" = "Range in PLHIV estimates",
-      "prop_leave_range" = "Range in the percentage who leave", 
       "prop_diagnosed_range" = "Range in proportion diagnosed", 
       "prop_art_range" = "Range in ART coverage",
       "prop_vs_range" = "Range in viral suppression estimates",
@@ -235,7 +234,6 @@ if (!loadProject) {
     paramsTime <- tibble(
       year = years,
       plhiv = rep('', nyears), 
-      prop_leave = rep('', nyears), 
       prop_diagnosed = rep('', nyears),
       prop_art = rep('', nyears),
       prop_vs = rep('', nyears),
@@ -438,7 +436,7 @@ if (!loadParameters) {
     params2sampleOnce <- c("effart", "effprep", "effcondom", "annual_cost",
       "lifetime_cost_0d", "lifetime_cost_35d", "lifetime_cost_50d", 
       "inflation_index_factor")
-    params2sampletwice <- c("plhiv", "prop_leave", "prop_diagnosed", "prop_art", 
+    params2sampletwice <- c("plhiv", "prop_diagnosed", "prop_art", 
       "prop_vs", "prop_prep", "prop_condom", "diagnosed_os", "diagnoses") 
     
     paramsSets[["simset"]] <- rep(1:numsims, each = nyears)
@@ -600,7 +598,7 @@ justifications for these parameter values. The simulations used for the
 calculations take samples from these ranges assuming a uniform distribution.
 
 | Parameter                       | Description                                                                                                                                                                                                                                                                                                                                                  | Estimate and Range                                                                                                                                                                                                                                                        | Notes |
-|-------------------|-------------------|-------------------------|-------------------|
+|-------------------|-------------------|-----------------------|-------------------|
 | $N(0)$                          | Number of people living with HIV in 2009                                                                                                                                                                                                                                                                                                                     | `r FormatData(parametersVar$plhiv[1], parametersVar$plhiv[1]*(parametersFixed %>% filter(code_variable == "plhiv_range"))$lower, parametersVar$plhiv[1]*(parametersFixed %>% filter(code_variable == "plhiv_range"))$upper, places = 0)`                                  | 1     |
 | **HIV transmission parameters** |                                                                                                                                                                                                                                                                                                                                                              |                                                                                                                                                                                                                                                                           |       |
 | $\beta$                         | Annual probability an untreated person transmits HIV to another person                                                                                                                                                                                                                                                                                       | Calculated using initial values                                                                                                                                                                                                                                           | 2     |
