@@ -1,6 +1,6 @@
 ---
-title: "Impact of treatment as prevention in Australia (skeleton)"
-date: Current draft produced `r format(Sys.Date(), format="%B %d, %Y")`.
+title: "Impact of U=U in Australia (skeleton)"
+#date: Current draft produced `r format(Sys.Date(), format="%B %d, %Y")`.
 author:
   - Richard T. Gray # PhD:
       # email: Rgray@kirby.unsw.edu.au
@@ -50,23 +50,34 @@ Current draft produced `r format(Sys.Date(), format="%B %d, %Y")`.
 -   Figures: 1
 -   Tables: 4
 
-Skeleton of the Impact of U=U paper. Only a simple model is used so this Quarto
-document contains the code and results generation. The majority of the
-manuscript is written here to enable results to be inserted. The write-up of the
-results for the abstract is done at the start of the Results section. Final
-editing needs to be completed in the resulting Word Document file to finalise
-the manuscript. This includes moving the abstract results and formatting the 
-time varying parameters in Table 2. 
+Skeleton of the U=U paper invited by the journal Sexual Health. Only a simple
+model is used so this Quarto document contains the code and results generation.
+The majority of the manuscript is written here to enable results to be inserted.
+The write-up of the results for the abstract is done at the start of the Results
+section. Final editing needs to be completed in the resulting Word Document file
+to finalise the manuscript. This includes moving the abstract results and
+reformatting the tables, and moving and reformatting the table and figure
+captions.
 
 <!--- The following code chunks set up the model and results generation for the paper--->
 
 \newpage
 
-## Abstract.
+## Abstract
 
-**Background**: **Methods**: **Results**: **Conclusions**:
+**Background**: 
+
+**Methods**:
+
+**Results**:
+
+**Conclusions**:
 
 ## Introduction
+
+
+
+
 
 ```{r Set-up}
 # Open as a project (setting working directory to source and restarting R)
@@ -539,19 +550,19 @@ simulate <- function(numyears, paramsDf) {
 justifications for these parameter values. The simulations used for the
 calculations take samples from these ranges assuming a uniform distribution. 
 
-Parameter | Description | Estimate and Range | Notes
+|Parameter | Description | Estimate and Range | Notes |
 ----------|-------------|--------------------|-----------
-$N(0)$ | Number of people living with HIV in 2009 | `r FormatData(parametersVar$plhiv[1], parametersVar$plhiv[1]*(parametersFixed %>% filter(code_variable == "plhiv_range"))$lower, parametersVar$plhiv[1]*(parametersFixed %>% filter(code_variable == "plhiv_range"))$upper, places = 0)` | 1
-**HIV transmission parameters**
-$\beta$ | Annual probability an untreated person transmits HIV to another person | Calculated using initial values | 2  
-$\epsilon_{ART}$ | Efficacy of ART in preventing HIV transmission if virus is suppressed | `r FormatData((parametersFixed %>% filter(code_variable == "effart"))$estimate, (parametersFixed %>% filter(code_variable == "effart"))$lower, (parametersFixed %>% filter(code_variable == "effart"))$upper)` | 3
-$\epsilon_{PrEP}$ | Efficacy of PrEP in preventing HIV transmission | `r FormatData((parametersFixed %>% filter(code_variable == "effprep"))$estimate, (parametersFixed %>% filter(code_variable == "effprep"))$lower, (parametersFixed %>% filter(code_variable == "effprep"))$upper)`| 4
-$\epsilon_{condom}$ | Efficacy of condoms in preventing HIV transmission | `r FormatData((parametersFixed %>% filter(code_variable == "effcondom"))$estimate, (parametersFixed %>% filter(code_variable == "effcondom"))$lower, (parametersFixed %>% filter(code_variable == "effcondom"))$upper)`| 5
-**HIV treatment costs**
-$c_{ART}$ | Average annual cost of providing care and ART in 2019 AUD | `r FormatData((parametersFixed %>% filter(code_variable == "annual_cost"))$estimate, (parametersFixed %>% filter(code_variable == "annual_cost"))$lower, (parametersFixed %>% filter(code_variable == "annual_cost"))$upper, places = 0, prefix = "$")` | 6  
-$c^0_{life}$ | Undiscounted lifetime cost of providing care and ART post infection in 2019 AUD | `r FormatData((parametersFixed %>% filter(code_variable == "lifetime_cost_0d"))$estimate, (parametersFixed %>% filter(code_variable == "lifetime_cost_0d"))$lower, (parametersFixed %>% filter(code_variable == "lifetime_cost_0d"))$upper, places = 0, prefix = "$")` | 7 
-$c^{3.5}_{life}$ | Lifetime cost of providing care and ART post infection in 2019 AUD discounted 3.5% | `r FormatData((parametersFixed %>% filter(code_variable == "lifetime_cost_35d"))$estimate, (parametersFixed %>% filter(code_variable == "lifetime_cost_35d"))$lower, (parametersFixed %>% filter(code_variable == "lifetime_cost_35d"))$upper, places = 0, prefix = "$")` | 7 
-$c^5_{life}$ | Lifetime cost of providing care and ART post infection in 2019 AUD discounted 5%| `r FormatData((parametersFixed %>% filter(code_variable == "lifetime_cost_50d"))$estimate, (parametersFixed %>% filter(code_variable == "lifetime_cost_50d"))$lower, (parametersFixed %>% filter(code_variable == "lifetime_cost_50d"))$upper, places = 0, prefix = "$")` | 7
+| $N(0)$ | Number of people living with HIV in 2009 | `r FormatData(parametersVar$plhiv[1], parametersVar$plhiv[1]*(parametersFixed %>% filter(code_variable == "plhiv_range"))$lower, parametersVar$plhiv[1]*(parametersFixed %>% filter(code_variable == "plhiv_range"))$upper, places = 0)` | 1 |
+|**HIV transmission parameters** | | | |
+|$\beta$ | Annual probability an untreated person transmits HIV to another person | Calculated using initial values | 2 | 
+|$\epsilon_{ART}$ | Efficacy of ART in preventing HIV transmission if virus is suppressed | `r FormatData((parametersFixed %>% filter(code_variable == "effart"))$estimate, (parametersFixed %>% filter(code_variable == "effart"))$lower, (parametersFixed %>% filter(code_variable == "effart"))$upper)` | 3 |
+| $\epsilon_{PrEP}$ | Efficacy of PrEP in preventing HIV transmission | `r FormatData((parametersFixed %>% filter(code_variable == "effprep"))$estimate, (parametersFixed %>% filter(code_variable == "effprep"))$lower, (parametersFixed %>% filter(code_variable == "effprep"))$upper)`| 4 |
+| $\epsilon_{condom}$ | Efficacy of condoms in preventing HIV transmission | `r FormatData((parametersFixed %>% filter(code_variable == "effcondom"))$estimate, (parametersFixed %>% filter(code_variable == "effcondom"))$lower, (parametersFixed %>% filter(code_variable == "effcondom"))$upper)`| 5 |
+|**HIV treatment costs** | | | |
+|$c_{ART}$ | Average annual cost of providing care and ART in 2019 AUD | `r FormatData((parametersFixed %>% filter(code_variable == "annual_cost"))$estimate, (parametersFixed %>% filter(code_variable == "annual_cost"))$lower, (parametersFixed %>% filter(code_variable == "annual_cost"))$upper, places = 0, prefix = "$")` | 6 |  
+|$c^0_{life}$ | Undiscounted lifetime cost of providing care and ART post infection in 2019 AUD | `r FormatData((parametersFixed %>% filter(code_variable == "lifetime_cost_0d"))$estimate, (parametersFixed %>% filter(code_variable == "lifetime_cost_0d"))$lower, (parametersFixed %>% filter(code_variable == "lifetime_cost_0d"))$upper, places = 0, prefix = "$")` | 7 |
+|$c^{3.5}_{life}$ | Lifetime cost of providing care and ART post infection in 2019 AUD discounted 3.5% `r FormatData((parametersFixed %>% filter(code_variable == "lifetime_cost_35d"))$estimate, (parametersFixed %>% filter(code_variable == "lifetime_cost_35d"))$lower, (parametersFixed %>% filter(code_variable == "lifetime_cost_35d"))$upper, places = 0, prefix = "$")` | 7 |
+|$c^5_{life}$ | Lifetime cost of providing care and ART post infection in 2019 AUD discounted 5%| `r FormatData((parametersFixed %>% filter(code_variable == "lifetime_cost_50d"))$estimate, (parametersFixed %>% filter(code_variable == "lifetime_cost_50d"))$lower, (parametersFixed %>% filter(code_variable == "lifetime_cost_50d"))$upper, places = 0, prefix = "$")` | 7 |
 
 1. 
 
@@ -566,6 +577,8 @@ $c^5_{life}$ | Lifetime cost of providing care and ART post infection in 2019 AU
 6.
 
 7.
+
+\newpage
 
 <!--- Manipulate the time varying parameters into a table--->
 ```{r Format time varying parameters}
@@ -590,6 +603,8 @@ the calculations, rather they are used for validation."
 knitr::kable(table2, row.names = FALSE, 
   caption = "Caption for cross-ref delete {#tbl-table2}")
 ```
+
+\newpage
 
 ## Results
 
@@ -999,7 +1014,7 @@ if (savePlots) {
     width = figWidth, height = figWidth, units = "in")
 }
 
-combinedPlotCaption <- ""
+combinedPlotCaption <- "Blah"
 
 # Create a formatted summary results table for manuscript ----------------------
 
@@ -1103,7 +1118,7 @@ if (savePlots) {
   
 }
 
-summaryTableCaption <- ""
+summaryTableCaption <- "Blah"
 
 # Create a scenario table for the HE results -----------------------------------
 costSummaryTable <- tibble(
@@ -1142,7 +1157,7 @@ if (savePlots) {
   
 }
 
-costTableCaption <- ""
+costTableCaption <- "Blah"
 
 ```
 
