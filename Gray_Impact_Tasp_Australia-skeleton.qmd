@@ -34,6 +34,7 @@ editor_options:
     wrap: 80
   canonical: true
 bibliography: references.bib
+csl: the-lancet.csl
 ---
 
 <!--- Frontmatter that I can't put into Yaml (as far as I can tell) --->
@@ -65,7 +66,7 @@ captions.
 
 ## Abstract
 
-**Background**: 
+**Background**:
 
 **Methods**:
 
@@ -75,9 +76,14 @@ captions.
 
 ## Introduction
 
+-   Intro to treatment as prevention
 
+-   Previous work on cost-effectiveness of ART but not previously done in
+    Australia
 
+-   Intro to Australia guidelines
 
+-   Intro to study
 
 ```{r Set-up}
 # Open as a project (setting working directory to source and restarting R)
@@ -278,6 +284,45 @@ if (!loadProject) {
 ```
 
 ## Methods
+
+We used a risk equation model to estimate the annual number of new HIV
+infections among GBMSM in Australia over the period 2009-2019. The approach
+expands on teh methods of previous analyses looking at the impact of ART and
+PrEP on HIV infections [@kelly_hiv_2015; @gray_funding_2017;
+@scott_achieving_nodate]. The period of analysis ranges from prior to the
+publication of the HPTN 052 clinical trial results in mid-2011
+[@cohen_prevention_2011] to the start of the COVID-19 pandemic.
+
+For this analysis we focused on GBMSM living with HIV in Australia because they
+make up the majority of people with HIV in Australia and use treatment and with
+undetectable viral load as a risk reduction strategy
+[@holt_community-level_2018]. For simplicity we did not stratify this population
+by risk behaviours for HIV acquisition prior to infection or transmission to
+susceptible sexual partners and considered the overall population level effects
+of changing HIV treatment coverage, primary prevention coverage, and scale-up of
+PrEP.
+
+#### Model equations
+
+To estimate the number of GBMSM living with HIV overtime we estimate the number
+of new infections and
+
+#### Input parameters
+
+For each fixed parameter we specified a best estimate and a uniform range of
+values. From these ranges we sampled 1000 parameter sets.
+
+#### HIV treatment costs
+
+#### Calculation scenarios
+
+#### Model outputs
+
+Results were obtained for the best estimate inputs and from summary statistics
+for the all simulations. Total costs are in 2019 AUD and rounded to the nearest
+**A**\$1 million/\$A**10,000**. All analyses and results were generated using R
+version XXXX with reproducible code available in an open access repository along
+with input parameters and the final results \[ref Github\].
 
 ```{r Useful functions}
 # This chunk sources useful functions for the set-up and analysis
@@ -496,9 +541,10 @@ NewInfections <- function(plhiv, beta, propdiag, propart, propvs, effart,
 # for the starting year (startYear). This values of beta is than used in the
 # simulations. 
 
-Beta <- function(incidence, plhiv, propdiag, propart, propvs, effart, propprep, 
-  effprep){
-  return(incidence / (plhiv * (1 - propdiag * propart * propvs * effart) * 
+Beta <- function(incidence, plhiv, propdiag, propart, propvs, effart,
+  propprep, effprep){
+  return(incidence / (plhiv * 
+      (1 - propdiag * propart * propvs * effart) * 
       (1 - propprep * effprep)))
 }
 
@@ -512,20 +558,23 @@ simulate <- function(numyears, paramsDf) {
   diagnosed <- rep(0, numyears)
   numArt <- rep(0, numyears)
   
-  infected[1] <- paramsDf$plhiv[1] 
   newInfects[1] <- paramsDf$diagnoses[1]
+  infected[1] <- paramsDf$plhiv[1] 
   diagnosed[1] <- infected[1] * paramsDf$prop_diagnosed[1]
   numArt[1] <- diagnosed[1] * paramsDf$prop_art[1]
   
   betaValue <- Beta(newInfects[1], infected[1], paramsDf$prop_diagnosed[1],
-    paramsDf$prop_art[1], paramsDf$prop_vs[1], paramsDf$effart[1],
-    paramsDf$prop_prep[1], paramsDf$effprep[1])
+    paramsDf$prop_art[1], paramsDf$prop_vs[1],
+    paramsDf$effart[1], paramsDf$prop_prep[1], paramsDf$effprep[1])
   
   for (ii in 2:numyears) {
     
-    infected[ii] <- infected[ii-1]  + newInfects[ii-1] + paramsDf$diagnosed_os[ii]
+    infected[ii] <- infected[ii-1]  + 
+      newInfects[ii-1] + paramsDf$diagnosed_os[ii]
     
-    newInfects[ii] <- NewInfections(infected[ii], betaValue, paramsDf$prop_diagnosed[ii],
+    newInfects[ii] <- NewInfections(infected[ii], 
+      betaValue,
+      paramsDf$prop_diagnosed[ii],
       paramsDf$prop_art[ii], paramsDf$prop_vs[ii], paramsDf$effart[ii], 
       paramsDf$prop_prep[ii], paramsDf$effprep[ii], 
       paramsDf$prop_condom[1], paramsDf$prop_condom[ii], 
@@ -548,39 +597,40 @@ simulate <- function(numyears, paramsDf) {
 
 **Table 1** - Fixed input parameter estimates and ranges. Endnotes provide
 justifications for these parameter values. The simulations used for the
-calculations take samples from these ranges assuming a uniform distribution. 
+calculations take samples from these ranges assuming a uniform distribution.
 
-|Parameter | Description | Estimate and Range | Notes |
-----------|-------------|--------------------|-----------
-| $N(0)$ | Number of people living with HIV in 2009 | `r FormatData(parametersVar$plhiv[1], parametersVar$plhiv[1]*(parametersFixed %>% filter(code_variable == "plhiv_range"))$lower, parametersVar$plhiv[1]*(parametersFixed %>% filter(code_variable == "plhiv_range"))$upper, places = 0)` | 1 |
-|**HIV transmission parameters** | | | |
-|$\beta$ | Annual probability an untreated person transmits HIV to another person | Calculated using initial values | 2 | 
-|$\epsilon_{ART}$ | Efficacy of ART in preventing HIV transmission if virus is suppressed | `r FormatData((parametersFixed %>% filter(code_variable == "effart"))$estimate, (parametersFixed %>% filter(code_variable == "effart"))$lower, (parametersFixed %>% filter(code_variable == "effart"))$upper)` | 3 |
-| $\epsilon_{PrEP}$ | Efficacy of PrEP in preventing HIV transmission | `r FormatData((parametersFixed %>% filter(code_variable == "effprep"))$estimate, (parametersFixed %>% filter(code_variable == "effprep"))$lower, (parametersFixed %>% filter(code_variable == "effprep"))$upper)`| 4 |
-| $\epsilon_{condom}$ | Efficacy of condoms in preventing HIV transmission | `r FormatData((parametersFixed %>% filter(code_variable == "effcondom"))$estimate, (parametersFixed %>% filter(code_variable == "effcondom"))$lower, (parametersFixed %>% filter(code_variable == "effcondom"))$upper)`| 5 |
-|**HIV treatment costs** | | | |
-|$c_{ART}$ | Average annual cost of providing care and ART in 2019 AUD | `r FormatData((parametersFixed %>% filter(code_variable == "annual_cost"))$estimate, (parametersFixed %>% filter(code_variable == "annual_cost"))$lower, (parametersFixed %>% filter(code_variable == "annual_cost"))$upper, places = 0, prefix = "$")` | 6 |  
-|$c^0_{life}$ | Undiscounted lifetime cost of providing care and ART post infection in 2019 AUD | `r FormatData((parametersFixed %>% filter(code_variable == "lifetime_cost_0d"))$estimate, (parametersFixed %>% filter(code_variable == "lifetime_cost_0d"))$lower, (parametersFixed %>% filter(code_variable == "lifetime_cost_0d"))$upper, places = 0, prefix = "$")` | 7 |
-|$c^{3.5}_{life}$ | Lifetime cost of providing care and ART post infection in 2019 AUD discounted 3.5% `r FormatData((parametersFixed %>% filter(code_variable == "lifetime_cost_35d"))$estimate, (parametersFixed %>% filter(code_variable == "lifetime_cost_35d"))$lower, (parametersFixed %>% filter(code_variable == "lifetime_cost_35d"))$upper, places = 0, prefix = "$")` | 7 |
-|$c^5_{life}$ | Lifetime cost of providing care and ART post infection in 2019 AUD discounted 5%| `r FormatData((parametersFixed %>% filter(code_variable == "lifetime_cost_50d"))$estimate, (parametersFixed %>% filter(code_variable == "lifetime_cost_50d"))$lower, (parametersFixed %>% filter(code_variable == "lifetime_cost_50d"))$upper, places = 0, prefix = "$")` | 7 |
+| Parameter                       | Description                                                                                                                                                                                                                                                                                                                                                  | Estimate and Range                                                                                                                                                                                                                                                        | Notes |
+|-------------------|-------------------|-------------------------|-------------------|
+| $N(0)$                          | Number of people living with HIV in 2009                                                                                                                                                                                                                                                                                                                     | `r FormatData(parametersVar$plhiv[1], parametersVar$plhiv[1]*(parametersFixed %>% filter(code_variable == "plhiv_range"))$lower, parametersVar$plhiv[1]*(parametersFixed %>% filter(code_variable == "plhiv_range"))$upper, places = 0)`                                  | 1     |
+| **HIV transmission parameters** |                                                                                                                                                                                                                                                                                                                                                              |                                                                                                                                                                                                                                                                           |       |
+| $\beta$                         | Annual probability an untreated person transmits HIV to another person                                                                                                                                                                                                                                                                                       | Calculated using initial values                                                                                                                                                                                                                                           | 2     |
+| $\epsilon_{ART}$                | Efficacy of ART in preventing HIV transmission if virus is suppressed                                                                                                                                                                                                                                                                                        | `r FormatData((parametersFixed %>% filter(code_variable == "effart"))$estimate, (parametersFixed %>% filter(code_variable == "effart"))$lower, (parametersFixed %>% filter(code_variable == "effart"))$upper)`                                                            | 3     |
+| $\epsilon_{PrEP}$               | Efficacy of PrEP in preventing HIV transmission                                                                                                                                                                                                                                                                                                              | `r FormatData((parametersFixed %>% filter(code_variable == "effprep"))$estimate, (parametersFixed %>% filter(code_variable == "effprep"))$lower, (parametersFixed %>% filter(code_variable == "effprep"))$upper)`                                                         | 4     |
+| $\epsilon_{condom}$             | Efficacy of condoms in preventing HIV transmission                                                                                                                                                                                                                                                                                                           | `r FormatData((parametersFixed %>% filter(code_variable == "effcondom"))$estimate, (parametersFixed %>% filter(code_variable == "effcondom"))$lower, (parametersFixed %>% filter(code_variable == "effcondom"))$upper)`                                                   | 5     |
+| **HIV treatment costs**         |                                                                                                                                                                                                                                                                                                                                                              |                                                                                                                                                                                                                                                                           |       |
+| $c_{ART}$                       | Average annual cost of providing care and ART in 2019 AUD                                                                                                                                                                                                                                                                                                    | `r FormatData((parametersFixed %>% filter(code_variable == "annual_cost"))$estimate, (parametersFixed %>% filter(code_variable == "annual_cost"))$lower, (parametersFixed %>% filter(code_variable == "annual_cost"))$upper, places = 0, prefix = "$")`                   | 6     |
+| $c^0_{life}$                    | Undiscounted lifetime cost of providing care and ART post infection in 2019 AUD                                                                                                                                                                                                                                                                              | `r FormatData((parametersFixed %>% filter(code_variable == "lifetime_cost_0d"))$estimate, (parametersFixed %>% filter(code_variable == "lifetime_cost_0d"))$lower, (parametersFixed %>% filter(code_variable == "lifetime_cost_0d"))$upper, places = 0, prefix = "$")`    | 7     |
+| $c^{3.5}_{life}$                | Lifetime cost of providing care and ART post infection in 2019 AUD discounted 3.5% `r FormatData((parametersFixed %>% filter(code_variable == "lifetime_cost_35d"))$estimate, (parametersFixed %>% filter(code_variable == "lifetime_cost_35d"))$lower, (parametersFixed %>% filter(code_variable == "lifetime_cost_35d"))$upper, places = 0, prefix = "$")` | 7                                                                                                                                                                                                                                                                         |       |
+| $c^5_{life}$                    | Lifetime cost of providing care and ART post infection in 2019 AUD discounted 5%                                                                                                                                                                                                                                                                             | `r FormatData((parametersFixed %>% filter(code_variable == "lifetime_cost_50d"))$estimate, (parametersFixed %>% filter(code_variable == "lifetime_cost_50d"))$lower, (parametersFixed %>% filter(code_variable == "lifetime_cost_50d"))$upper, places = 0, prefix = "$")` | 7     |
 
-1. 
+1.  
 
-2.
+2.  
 
-3.
+3.  
 
-4.
+4.  
 
-5.
+5.  
 
-6.
+6.  
 
-7.
+7.  
 
 \newpage
 
 <!--- Manipulate the time varying parameters into a table--->
+
 ```{r Format time varying parameters}
 table2 <- parametersVar %>%
   gather(key = var_name, value = value, 2:ncol(.)) %>% 
@@ -675,7 +725,8 @@ figRowWidth <- 8/2.5
 # Extract results --------------------------------------------------------------
 validationData <- paramsBest %>% select(year, plhiv, diagnoses)
 
-plhivPlot <- ggplot(data = resultsSims, aes(x = year, y = infected, group = simset)) + 
+plhivPlot <- ggplot(data = resultsSims, 
+  aes(x = year, y = infected, group = simset)) + 
   geom_line(aes(colour = "sims")) +
   geom_line(data = resultsBest, aes(group = 1, colour = "best")) +
   geom_point(data = validationData, aes(y = plhiv, group = 1, color = "data")) +
@@ -688,7 +739,8 @@ plhivPlot <- ggplot(data = resultsSims, aes(x = year, y = infected, group = sims
   xlab("Year") + ylab("Number of people with HIV") + 
   PlotOptions()
 
-infectionsPlot <- ggplot(data = resultsSims, aes(x = year, y = newInfects, group = simset)) + 
+infectionsPlot <- ggplot(data = resultsSims, 
+  aes(x = year, y = newInfects, group = simset)) + 
   geom_line(aes(colour = "sims")) +
   geom_line(data = resultsBest, aes(group = 1, colour = "best")) +
   geom_point(data = validationData, aes(y = diagnoses, group = 1, color = "data")) +
@@ -1170,6 +1222,11 @@ costTableCaption <- "Blah"
 ## Conflicts of Interest
 
 ## Acknowledgements
+
+## References
+
+::: {#refs}
+:::
 
 \newpage
 
