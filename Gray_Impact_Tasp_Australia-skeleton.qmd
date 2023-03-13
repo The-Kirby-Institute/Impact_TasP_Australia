@@ -303,7 +303,7 @@ PrEP.
 #### Model equations
 
 To estimate the number of GBMSM living with HIV overtime we estimate the number
-of new infections and
+of new infections that occur in Australia each year
 
 #### Input parameters
 
@@ -333,7 +333,7 @@ IndexCPI <- function(cpi) {
   
   for (ii in 1:(n-1)) {
     index[ii] = 
-      prod(cpi[ii:(n-1)])
+      1 / prod(cpi[ii:(n-1)])
   }
   
   return(index)
@@ -525,8 +525,8 @@ if (!loadParameters) {
 # Main function ----------------------------------------------------------------
 # This is the main function for the analysis calculating the number of new
 # infections for a given year from the input data
-NewInfections <- function(plhiv, beta, propdiag, propart, propvs, effart, 
-  propprep, effprep, condom0, condomt, effcondom) {
+NewInfections <- function(plhiv, beta, propdiag, propart, propvs, 
+  effart, propprep, effprep, condom0, condomt, effcondom) {
   
   return(plhiv * beta *(1 - propdiag * propart*propvs*effart) * 
       (1 - propprep * effprep) * (1 - effcondom * condomt) / 
@@ -541,8 +541,7 @@ NewInfections <- function(plhiv, beta, propdiag, propart, propvs, effart,
 
 Beta <- function(incidence, plhiv, propdiag, propart, propvs, effart,
   propprep, effprep){
-  return(incidence / (plhiv * 
-      (1 - propdiag * propart * propvs * effart) * 
+  return(incidence / (plhiv * (1 - propdiag * propart * propvs * effart) * 
       (1 - propprep * effprep)))
 }
 
@@ -561,14 +560,14 @@ simulate <- function(numyears, paramsDf) {
   diagnosed[1] <- infected[1] * paramsDf$prop_diagnosed[1]
   numArt[1] <- diagnosed[1] * paramsDf$prop_art[1]
   
-  betaValue <- Beta(newInfects[1], infected[1], paramsDf$prop_diagnosed[1],
+  betaValue <- Beta(newInfects[1], infected[1], 
+    paramsDf$prop_diagnosed[1],
     paramsDf$prop_art[1], paramsDf$prop_vs[1],
     paramsDf$effart[1], paramsDf$prop_prep[1], paramsDf$effprep[1])
   
   for (ii in 2:numyears) {
     
-    infected[ii] <- infected[ii-1]  + 
-      newInfects[ii-1] + paramsDf$diagnosed_os[ii]
+    infected[ii] <- infected[ii-1] + newInfects[ii-1] + paramsDf$diagnosed_os[ii]
     
     newInfects[ii] <- NewInfections(infected[ii], 
       betaValue,
@@ -598,7 +597,7 @@ justifications for these parameter values. The simulations used for the
 calculations take samples from these ranges assuming a uniform distribution.
 
 | Parameter                       | Description                                                                                                                                                                                                                                                                                                                                                  | Estimate and Range                                                                                                                                                                                                                                                        | Notes |
-|-------------------|-------------------|-----------------------|-------------------|
+|--------------------|--------------------|----------------------|--------------------|
 | $N(0)$                          | Number of people living with HIV in 2009                                                                                                                                                                                                                                                                                                                     | `r FormatData(parametersVar$plhiv[1], parametersVar$plhiv[1]*(parametersFixed %>% filter(code_variable == "plhiv_range"))$lower, parametersVar$plhiv[1]*(parametersFixed %>% filter(code_variable == "plhiv_range"))$upper, places = 0)`                                  | 1     |
 | **HIV transmission parameters** |                                                                                                                                                                                                                                                                                                                                                              |                                                                                                                                                                                                                                                                           |       |
 | $\beta$                         | Annual probability an untreated person transmits HIV to another person                                                                                                                                                                                                                                                                                       | Calculated using initial values                                                                                                                                                                                                                                           | 2     |
