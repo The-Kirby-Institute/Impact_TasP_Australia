@@ -1,6 +1,6 @@
 ---
-title: "Impact of U=U in Australia (skeleton)"
-# date: Current draft produced `r format(Sys.Date(), format="%B %d, %Y")`.
+title: "Impact of treatment as prevention in Australia (skeleton)"
+date: Current draft produced `r format(Sys.Date(), format="%B %d, %Y")`.
 author:
   - Richard T. Gray # PhD:
       # email: Rgray@kirby.unsw.edu.au
@@ -16,9 +16,9 @@ format:
     number-sections: false
     page-width: 8.25
     filters: 
-      # - pagebreak.lua
-      # - scholarly-metadata.lua
-      # - author-info-blocks.lua
+      #   - pagebreak.lua
+      #   - scholarly-metadata.lua
+      #   - author-info-blocks.lua
       - C:/Users/rgray/OneDrive - UNSW/R/LeftysRstuff/Rmarkdown/filters/pagebreak.lua
       - C:/Users/rgray/OneDrive - UNSW/R/LeftysRstuff/Rmarkdown/filters/scholarly-metadata.lua
       - C:/Users/rgray/OneDrive - UNSW/R/LeftysRstuff/Rmarkdown/filters/author-info-blocks.lua
@@ -33,7 +33,7 @@ editor_options:
   markdown:
     wrap: 80
   canonical: true
-# bibliography: references.bib
+bibliography: references.bib
 ---
 
 <!--- Frontmatter that I can't put into Yaml (as far as I can tell) --->
@@ -100,7 +100,7 @@ currTime <- format(Sys.time(), "%y-%m-%d_%H-%M-%S") # for appending to
 # to load. This is set up so long simulation runs do not need to be repeated.
 
 # Manually enter file name tag to regenerate old results
-loadFileTag <-NULL # "23-03-01_14-33-59_Impact_Tasp" # set to NULL to run things from scratch
+loadFileTag <- "23-03-13_01-16-16_Impact_Tasp" # set to NULL to run things from scratch
 
 if (is.null(loadFileTag)) {
   # Set to default values 
@@ -110,7 +110,7 @@ if (is.null(loadFileTag)) {
   
   useSeed <- FALSE        # set to FALSE to create new seed for generating results
   
-  saveProject <- TRUE    # save project, parameters, and results files
+  saveProject <- FALSE    # save project, parameters, and results files
   
 } else {
   
@@ -138,7 +138,6 @@ simSpecs <- tibble::lst(loadFileTag, loadProject, loadParameters, loadResults,
 # Results output options
 
 savePlots <- TRUE    # save plots to file
-# knitplots <- TRUE    # insert plots in the produced Rmarkdown document
 saveFormat <- ".svg" # Format for saving plots
 
 ```
@@ -329,8 +328,7 @@ FormatDecimal <- function(value, places = 2) {
 # This chunk reads in the parameter input files and coverts them into parameter 
 # sets for input into the model simulations
 
-# TODO: Decide if we need beta distributions. Currently just using uniform 
-# distributions for sampling.  
+# Currently just using uniform distributions for sampling.  
 
 if (!loadParameters) {
   
@@ -651,7 +649,7 @@ pc <- function(col) unname(plotcols[col])
 
 # Set up figure sizes in document - in inches for Knitr chunk headers
 figWidth <- 22/2.5
-# figRowWidth <- 8/2.5
+figRowWidth <- 8/2.5
 
 ```
 
@@ -1165,7 +1163,7 @@ costTableCaption <- ""
 <!--- Inserted using code chunks and the loaded results --->
 
 ```{r Table 3}
-#| label: tbl-table1
+#| label: tbl-table3
 #| tbl-cap: !expr summaryTableCaption 
 #| tbl-cap-location: top # Doesn't seem to work
 #| include: true
@@ -1177,7 +1175,7 @@ knitr::kable(summaryTable, row.names = FALSE,
 \newpage
 
 ```{r Table 4}
-#| label: tbl-table1
+#| label: tbl-table4
 #| tbl-cap: !expr costTableCaption 
 #| tbl-cap-location: top # Doesn't seem to work
 #| include: true
