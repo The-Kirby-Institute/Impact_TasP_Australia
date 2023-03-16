@@ -286,8 +286,8 @@ if (!loadProject) {
 We used a risk equation model to estimate the annual number of new HIV
 infections among GBMSM in Australia over the period 2009-2019. The approach
 expands on teh methods of previous analyses looking at the impact of ART and
-PrEP on HIV infections [@kelly_hiv_2015; @gray_funding_2017;
-@scott_achieving_nodate]. The period of analysis ranges from prior to the
+PrEP on HIV infections.[@kelly_hiv_2015; @gray_funding_2017;
+@scott_achieving_nodate] The period of analysis ranges from prior to the
 publication of the HPTN 052 clinical trial results in mid-2011
 [@cohen_prevention_2011] to the start of the COVID-19 pandemic.
 
@@ -297,30 +297,158 @@ undetectable viral load as a risk reduction strategy
 [@holt_community-level_2018]. For simplicity we did not stratify this population
 by risk behaviours for HIV acquisition prior to infection or transmission to
 susceptible sexual partners and considered the overall population level effects
-of changing HIV treatment coverage, primary prevention coverage, and scale-up of
-PrEP.
+of changing HIV treatment coverage, sexual behaviour and primary prevention coverage, and the scale-up of PrEP.
 
 #### Model equations
 
-To estimate the number of GBMSM living with HIV overtime we estimate the number
-of new infections that occur in Australia each year
+To estimate the number of people living with HIV overtime we used the following
+difference equation
+
+$$ 
+N_{t+1} = N_{t} + I_{t} + N^{o}_{t}, 
+$$ {#eq-plhiv}
+
+where $N_t$ is the number of people living with HIV in year $t$, $I_t$ is the
+number of new HIV infections in year $t$, and $N^o_t$ is the number of people
+living with HIV arriving from overseas in year $t$.
+
+To calculate the number of new HIV infections in Australia each year we derived
+an equation that incorporates the effects of viral suppression due to treatment,
+HIV PrEP, and changes in sexual behaviour on transmission. First we assume the
+probability for a person with HIV with unsuppressed virus to transmit HIV to
+another person is fixed over time (denoted by $\beta$ per person per year). If
+no one is on effective treatment or PrEP and there is no change in prevention
+strategies or sexual behaviour the number of new infections in year $t$ is 
+$I_t = N_t \beta$.
+
+People with viral suppression through effective ART have a lower probability of
+transmission given by a factor $(1-\epsilon_{ART})$. The concept of undetectable
+equalling transmittable or U=U is based on the the efficacy of viral suppression
+$\epsilon_{ART}$ being 100%. However, at the population level where there might
+not be perfect adherence and viral blips can occur this efficacy will be high
+but less than 100% *\[refs\]*. We assumed $\epsilon_{ART}$ was
+`r FormatPercent(100*(parametersFixed %>% filter(code_variable == "effart"))$estimate, places =0)`
+with range of
+`r FormatData(100*(parametersFixed %>% filter(code_variable == "effart"))$lower, places =0)` -
+`r FormatPercent(100*(parametersFixed %>% filter(code_variable == "effart"))$upper, places =0)`
+. If in year $t$, the proportion of people with HIV diagnosed is $d_t$, the
+proportion diagnosed on ART is $\theta_t$ and the proportion treated with viral
+suppression is $\psi_t$ (following the HIV cascade steps) then the overall
+proportion virally suppressed will be $d_t\theta_t\psi_t$ and the value of
+$\beta$ will be reduced by a factor $(1-d_t\theta_t\psi_t\epsilon_{ART})$.
+
+If a proportion $p_t$ of the susceptible population is taking PrEP in year $t$
+then there will be a similar reduction in beta due to the efficacy of PrEP
+\[$\epsilon_{PrEP}$; assumed to be\
+`r FormatRangePercent(100*(parametersFixed %>% filter(code_variable == "effprep"))$estimate, 100*(parametersFixed %>% filter(code_variable == "effprep"))$lower, 100*(parametersFixed %>% filter(code_variable == "effprep"))$upper, places = 0)`\] *\[refs\]*
+given by $(1-p_t \epsilon_{PrEP})$.
+
+To consider the effects of changes in sexual behaviour and the impact of other
+prevention strategies on transmission over time we incorporated the effect of
+changing condom use. If condoms are used a proportion $c_0$ of the time in the
+initial year $t=1$ (`r project$projectVars$startYear` for our analysis) with an
+effectiveness of $\epsilon_c$ but in year $t$ there is a condom usage of $c_t$
+then the relative change in transmission on average will be given by the
+relative factor $(1-c_t\epsilon_c)/(1-c_0\epsilon_c)$ for the overall
+population.
+
+Combining each of these effects for viral suppression, PrEP, and the relative
+change in condom use gives the following equation for the number of new
+infections each year $$
+I_{t+1} = N_t\beta(1-d_t\theta_t\psi_t\epsilon_s)(1-p_t \epsilon_p)\frac{(1-c_t \epsilon_c)}{(1-c_0\epsilon_c)}.
+$$ {#eq-incidence}
+
+From initial estimates for $N_0$, $I_0$, and $N^o_0$ for the first year $t=1$
+and appropriate data/parameter inputs the model can then use @eq-plhiv and
+@eq-incidence to iterate over each year and obtain estimates for the number of
+people living with HIV and the number of new HIV infections each year.
 
 #### Input parameters
 
-For each fixed parameter we specified a best estimate and a uniform range of
-values. From these ranges we sampled 1000 parameter sets.
+The model has three parameters that are fixed over time $\epsilon_{ART}$,
+$\epsilon_{PrEP}$, and $\epsilon_c$. These are all biologically basedwe
+specified a best estimate and a uniform range of values based on empirical data
+(see @tbl-table1). The majority of inputs can vary over time and require an
+estimate for each year for the period of analysis 2009-2019.
+
+Estimates for each step of the HIV cascade for GBMSM were obtained from national 
+surveillance which reports estimates for each step of the cascade. 
+
+* Sentence proportion diagnoses
+* Sentence % on ART from Gay Community Periodic Surveys 
+* Proportion suppressed from AHOD ($<200$ cells/$\micro$l)
+
+The coverage of PrEP in the overall GBMSM population was estimated using data
+reported in the Australian Trends in Behaviour Report which collates data from
+Gay Community Periodic Surveys across Australia. Coverage obtained by
+multiplying the proportion eligible for PrEP by the proportion who take PrEP.
+
+For estimates of condom use we used the measure of consistent condom use from
+the Australian Trends in Behaviour Report. While this measure is not necessarily
+ideal because teh model uses a ratio and incorporates the relative change. We
+think this measure provides a reasonble measure for the change in sexual
+behaviour over time following the ... and the scale-up of PrEP.
+
+* Generation of sampled sets. For each fixed parameter we sampled 1000 parameter
+from the ranges specified in @tbl-table1 sets. We generated uncertainty in the
+time varying parameters by specifying a range in the yearly values using an
+assumed multiplicative factor. Uncertainty values for each year were then
+generated by sampling a value for the start and years of the period and joining
+them linearly.
+
+* To run the calculations using Eqs. @eq-plhiv and @eq-incidence requires an
+initial estimate for $N_1$, $I_1$ and $N^o_1$ corresponding to the year 2009.
+* We used the estimated number of people with HIV in 2009 for $N_1$.
+* To initialize new infections we used the reported number of notifications for HIV 
+excluding those previously diagnosed overseas in 2009 
+
+this assumption has been validated
+in previous modelling studies [ref ],
+
+* Estimates of PLHIV and reported diagnoses excluding those previously diagnosed overseas
+for 2009-2019 were used for model validation.
 
 #### HIV treatment costs
 
+A recent health economics study provides estimates for the lifetime cost of
+providing HIV care and treatment to people living with HIV in 2019 AUD *[ref]*.
+The estimated cost varied from an undiscounted cost of A$XXXX to A$XXX with 5%
+discounting. The study also estimated the short- to medium-term cost which can
+be used to estimate the annual cost of providing care and treatment. We used the
+undiscounted 10-year costing to estimate the annual cost in 2019.
+
+To estimate respective costs for each year prior to 2019 ....
+
+
+
+* Considered different inflation scenarios.  
+
+* Paragraph describing the calculations: number of people on ART * annual cost
+for each inflations scenario and number of new infections * lifetime cost for
+each inflation and discounting assumption
+
 #### Calculation scenarios
+
+* Health provider perspective
+
+To estimate the impact and costs associated with the earlier initiation of ART
+we simulated two scenarios using Eqs. @eq-plhiv and @eq-incidence. The first
+scenario represents the status-qup/baseline ... the second scenario assumes the
+level of ART coverage among the diagnosed population $\theta_t$ did not increase
+since the time treatment as prevention became established as a prevention
+strategy... assumed this was from 2012... 
+
+* For this year the proportion of all GBMSM on ART was 
+`r `
+. 
 
 #### Model outputs
 
 Results were obtained for the best estimate inputs and from summary statistics
 for the all simulations. Total costs are in 2019 AUD and rounded to the nearest
-**A**\$1 million/\$A**10,000**. All analyses and results were generated using R
-version XXXX with reproducible code available in an open access repository along
-with input parameters and the final results \[ref Github\].
+A\$1 million/\$A10,000. All analyses and results were generated using R version
+XXXX with reproducible code available in an open access repository along with
+input parameters and the final results \[ref Github\].
 
 ```{r Useful functions}
 # This chunk sources useful functions for the set-up and analysis
@@ -342,7 +470,7 @@ IndexCPI <- function(cpi) {
 
 # Function to adjust inflation by an overall factor
 MultiplyCPI <- function(cpiIndex, factor) {
-  return(factor*(cpiIndex)-1 )
+  return(factor*(cpiIndex-1)+1 )
 }
 
 # Define some useful functions for formatting results---------------------------
@@ -364,7 +492,7 @@ FormatRangePercent <- function(value, low, up, places = 1) {
 }
 
 Format95 <- function(value, low, up, places = 2) {
-  FormatData(value, lower = low, upper = up, rangestr = "95% CI: ", 
+  FormatData(value, lower = low, upper = up, rangestr = "95% PI: ", 
     places = places, decimal = decimalMark)
 }
   
@@ -597,7 +725,7 @@ justifications for these parameter values. The simulations used for the
 calculations take samples from these ranges assuming a uniform distribution.
 
 | Parameter                       | Description                                                                                                                                                                                                                                                                                                                                                  | Estimate and Range                                                                                                                                                                                                                                                        | Notes |
-|--------------------|--------------------|----------------------|--------------------|
+|--------------------|--------------------|---------------------|--------------------|
 | $N(0)$                          | Number of people living with HIV in 2009                                                                                                                                                                                                                                                                                                                     | `r FormatData(parametersVar$plhiv[1], parametersVar$plhiv[1]*(parametersFixed %>% filter(code_variable == "plhiv_range"))$lower, parametersVar$plhiv[1]*(parametersFixed %>% filter(code_variable == "plhiv_range"))$upper, places = 0)`                                  | 1     |
 | **HIV transmission parameters** |                                                                                                                                                                                                                                                                                                                                                              |                                                                                                                                                                                                                                                                           |       |
 | $\beta$                         | Annual probability an untreated person transmits HIV to another person                                                                                                                                                                                                                                                                                       | Calculated using initial values                                                                                                                                                                                                                                           | 2     |
@@ -1048,12 +1176,16 @@ if (savePlots) {
 ```
 
 ```{r Save paper output}
-# Create and save the final plot and tables for the manuscript
+# Create and save the final plots and tables for the manuscript
 
-# Create a combination plot for manuscript -------------------------------------
+# Create a combination plot for the main manuscript 
 combinedPlot <- plot_grid(resultsPlhiv, resultsInfects, resultsCumInfects, HEplot,
    ncol = 2, nrow = 2, align = "v", labels = c("A", "B", "C", "D"))
 
+# Create a validation plot for the supplementary material
+
+validationPlot <- plot_grid(plhivPlot, infectionsPlot, 
+  ncol = 2, nrow = 1, labels = c("A", "B"))
 
 if (savePlots) {
   
@@ -1061,32 +1193,40 @@ if (savePlots) {
     paste0("Combined_Figure_", loadFileTag), 
     combinedPlot, format = saveFormat, 
     width = figWidth, height = figWidth, units = "in")
+  
+  SaveFigure(file.path(resultsFolder, "figures"), 
+    paste0("Validation_Figure_", loadFileTag), 
+    validationPlot, format = saveFormat, 
+    width = figWidth, height = figWidth/2, units = "in")
+  
 }
 
 combinedPlotCaption <- "Blah"
 
+validationPlotCaption <- "Blah"
+
 # Create a formatted summary results table for manuscript ----------------------
 
-lprob <- 0.025 # lower and upper probs for quantile function
+lprob <- 0.025 # lower and upper probs for quantile function - 95% percentile interval
 uprob <- 0.975
 
 # Functions to simply table generation
-Format2019 <- function(option, indicator, digits = 0) {
+Format2019 <- function(option, indicator, digits = 0, rangestr = "") {
   FormatData(
     (scenarioResultsBest %>% filter(scenario == option, year == 2019))[[indicator]], 
     quantile((scenarioResultsSims %>% filter(scenario == option, year == 2019))[[indicator]], 
       probs = lprob), 
     quantile((scenarioResultsSims %>% filter(scenario == option, year == 2019))[[indicator]], 
       probs = uprob),
-    places = digits)
+    places = digits, rangestr = rangestr)
 }
 
-FormatCumulative <- function(option, digits = 0) {
+FormatCumulative <- function(option, digits = 0, rangestr = "") {
   FormatData(
     (scenarioResultsBest %>% filter(scenario == option))$newInfects %>% sum(), 
-    quantile(avertedInfects[[option]], probs = lprob), 
-    quantile(avertedInfects[[option]], probs = uprob),
-    places = digits)
+    quantile(cumInfects[[option]], probs = lprob), 
+    quantile(cumInfects[[option]], probs = uprob),
+    places = digits, rangestr = rangestr)
 }
 
 FormatCosts <- function(option, indicator, digits = 0, scale = 0){
@@ -1212,7 +1352,48 @@ costTableCaption <- "Blah"
 
 **Abstract Results**:
 
+
+
 **Main results**
+
+The model estimates under the baseline scenario that the number of people living
+with HIV in 2019 was 
+`r Format2019("base", "infected", rangestr = "95% PI: ")`
+with 
+`r Format2019("base", "newInfects", rangestr = "95% PI: ")` 
+new infections. This closely aligns with estimates from the Australian HIV
+cascade which estimates there were 21,400 (range: 18,520-24,440) people living
+with HIV in 2019.[@institute_hiv_2022] The number of new infections from the
+model calculations was lower over 2009-2019 but comparable to the number of new
+notifications excluding those previously diagnosed overseas (598 notifications
+in 2019 with a peak of 807 in 2014 [@institute_hiv_2022]). See Figure
+@fig-figureS1 in the supplementary material. This shows our model has good
+validity for estimating the number of people taking ART and the number of new
+infections over the analysis period.
+
+
+If there was no increase in ART since
+`r project$projectVars$indexYearART`
+(the counter factual scenario) the model estimates there would have have been
+`r Format2019("scenario", "infected", rangestr = "95% PI: ")`
+people living with HIV in 2019 (@fig-figure1 A) and 
+`r Format2019("scenario", "newInfects", rangestr = "95% PI: ")`
+new HIV infections (@fig-figure1 B). These are 
+`r FormatPercent(100 *((scenarioResultsBest %>% filter(year == 2019))$infected[2]/ (scenarioResultsBest %>% filter(year == 2019))$infected[1] - 1))` 
+and 
+`r FormatPercent(100 *((scenarioResultsBest %>% filter(year == 2019))$newInfects[2]/ (scenarioResultsBest %>% filter(year == 2019))$newInfects[1] - 1))` 
+higher, respectively,  
+than for the baseline scenario. Cumulatively we estimate there were
+`r FormatCumulative("base", rangestr = "95% PI: ")`
+and 
+`r FormatCumulative("scenario", rangestr = "95% PI: ")`
+new HIV infections for the baseline and counter factual scenarios, respectively,
+over 2009-2019 (@fig-figure1 C). This implies the increase in ART coverage since
+the start of the treatment as prevention era could have averted an additional
+`r FormatData((scenarioResultsBest %>% group_by(scenario) %>% summarise(infections = sum(newInfects)))$infections %>% diff(), quantile(avertedInfects$averted, probs = lprob),  quantile(avertedInfects$averted, probs = uprob), places = 0, rangestr = "95% PI: ")`
+new HIV infections. 
+
+* Paragraph on costing results. 
 
 ## Discussion
 
@@ -1266,3 +1447,21 @@ knitr::kable(costSummaryTable, row.names = FALSE,
 #| fig-height: !expr 2*figRowWidth
 print(combinedPlot)
 ```
+
+## Supplementarty Material
+
+### Validation of calculations
+
+```{r Figure S1}
+#| label: fig-figureS1
+#| include: true
+#| fig-cap: !expr combinedPlotCaption
+#| fig-cap-location: top # Doesn't seem to work
+#| fig-width: !expr figWidth
+#| fig-height: !expr 2*figRowWidth
+print(validationPlot)
+```
+
+### Retrospective adjustement of cost ings for 20-19
+
+
