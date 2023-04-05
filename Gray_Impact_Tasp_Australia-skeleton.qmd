@@ -66,7 +66,8 @@ captions.
 
 ## Abstract
 
-**Background**:
+**Background**: A retrospective modelling analysis of the impact of increasing 
+antiretroviral therapy in Australia over the 2009-2019 period. 
 
 **Methods**:
 
@@ -76,14 +77,60 @@ captions.
 
 ## Introduction
 
--   Intro to treatment as prevention
+The early initiation of effective antiretroviral therapy (ART) among people
+living with HIV to achieve viral suppression results in long term disease
+remission reducing morbidity and mortality.[@bor_increases_2013;
+@brinkhof_mortality_2009; @egger_prognosis_2002; @may_prognosis_2010] By the
+late 2000s, evidence for ART to also reduce HIV transmission with the potential
+for overall population effectiveness had accumulated.[@attia_sexual_2009;
+@donnell_heterosexual_2010; @cohen_prevention_2011; @granich_universal_2009;
+@wilson_relation_2008] This “treatment as prevention” effect became
+well-established following several clinical trials that showed high population
+efficacy (>90%) and the benefits for starting ART as soon as possible after
+diagnosis.[@noauthor_initiation_2015; @noauthor_trial_2015;
+@koenig_same-day_2017; rosen_initiating_2016; @pilcher_effect_2017] This results
+formed the basis for the concept that “Undetectable equals Untransmissible” or
+U=U.[@hiv_uu_2017] Treatment as prevention is now a key prevention strategy and
+a crucial component for the HIV response in Australia and internationally and
+underpins the UNAIDS 95-95-95 HIV cascade targets and the goal of ending AIDS by
+2030.[@unaids_danger_2022; @institute_hiv_2022; @noauthor_90-90-90_2014]
 
--   Previous work on cost-effectiveness of ART but not previously done in
-    Australia
+Following the publication of the interim results from the seminal HPTN 052 trial
+in 2011, which estimated that ART reduces the risk of sexual transmission to
+others by 96%,[@cohen_prevention_2011] several modelling studies estimated the
+population level impact and cost-effectiveness of early initiation of ART and
+treatment as prevention.[@granich_expanding_2012; @kahn_cost-effectiveness_2011;
+@long_initiating_2017; @eaton_health_2014] These studies generally conducted
+scenario analyses to project the future impact of ART and showed that early
+initiation would reduce new HIV infections and associated HIV care and treatment
+costs. However, we are not aware of any studies of the impact and cost
+effectiveness of increasing ART in Australia following changes in guidelines to
+recommend earlier initiation of ART.
 
--   Intro to Australia guidelines
+As the evidence for the benefits of the early initiation of ART became apparent,
+HIV treatment guidelines in Australia changed. In 2007, guidelines started
+recommending people with HIV begin ART when their CD4 cell count fell below 350
+cells/μL.[@ashm_antiretroviral_nodate] This treatment threshold changed to less
+than 500 cells/μL in 2009. Even though the United States Department of Health
+and Human Services (DHHS) and other organizations began recommending treatment
+for all people with HIV in 2012, there was no definitive recommendation in
+Australian guidelines for all people with HIV to be on treatment until June 2015
+after the release of the START trial results.[@noauthor_initiation_2015] Prior
+to 2015, Australian HIV treatment recommendations provided qualified support for
+the initiation of ART in all people with HIV but with a consideration of risks
+and benefits. Despite these qualifications it is likely that international
+guidelines would have influenced clinician and patient decision making, meaning
+changes in treatment initiation at the population level likely occurred prior to
+2015.
 
--   Intro to study
+In this retrospective study, we used a mathematical model to calculate the
+potential impact of increased ART use during the early initiation and treatment
+as prevention era. This analysis considered the change in ART use, the scale-up
+of PrEP and the associated changes in sexual behavior from the time when
+Australian guidelines first started to recommend earlier initiation of ART in
+2009. We provide estimates of the population level changes in new HIV infections
+and the potential costs and benefits of increasing the proportion of people on
+ART up to 2019 just prior to the start of the COVID-19 pandemic.
 
 ```{r Set-up}
 # Open as a project (setting working directory to source and restarting R)
@@ -795,7 +842,7 @@ to 2019.
 Results were obtained for the best estimate inputs and from summary statistics
 for the all simulations. Total costs are in 2019 AUD and rounded to the nearest
 A\$1 million/\$A10,000. All analyses and results were generated using R version
-XXXX with reproducible code available in an open access repository along with
+4.2.2 with reproducible code available in an open access repository along with
 input parameters and the final results \[ref Github\].
 
 **Table 1** - Fixed input parameter estimates and ranges. Endnotes provide
