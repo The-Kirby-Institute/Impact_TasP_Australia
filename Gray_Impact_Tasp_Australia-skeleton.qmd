@@ -126,7 +126,7 @@ changes in treatment initiation at the population level likely occurred prior to
 In this retrospective study, we used a mathematical model to calculate the
 potential impact of increased ART use during the early initiation and treatment
 as prevention era. This analysis considered the change in ART use, the scale-up
-of PrEP and the associated changes in sexual behavior from the time when
+of PrEP and the associated changes in sexual behaviour from the time when
 Australian guidelines first started to recommend earlier initiation of ART in
 2009. We provide estimates of the population level changes in new HIV infections
 and the potential costs and benefits of increasing the proportion of people on
@@ -164,7 +164,7 @@ currTime <- format(Sys.time(), "%y-%m-%d_%H-%M-%S") # for appending to
 # to load. This is set up so long simulation runs do not need to be repeated.
 
 # Manually enter file name tag to regenerate old results
-loadFileTag <- "23-03-13_01-16-16_Impact_Tasp" # set to NULL to run things from scratch
+loadFileTag <- NULL # set to NULL to run things from scratch
 
 if (is.null(loadFileTag)) {
   # Set to default values 
@@ -415,16 +415,30 @@ if (!loadParameters) {
   costingsBest <- paramsBest %>% 
     select(year, inflation_index, annual_cost, lifetime_cost_0d, 
       lifetime_cost_35d, lifetime_cost_50d) %>%
-    mutate(cumulative_index = IndexCPI(inflation_index),
-      cumulative_index2 = IndexCPI(MultiplyCPI(inflation_index, 2))) %>%
-    mutate(ac_adjusted = cumulative_index * annual_cost,
-      lc0_adjusted = cumulative_index *  lifetime_cost_0d, 
-      lc35_adjusted = cumulative_index *  lifetime_cost_35d,
-      lc50_adjusted = cumulative_index *  lifetime_cost_50d,
-      ac_adjusted2 = cumulative_index2 * annual_cost,
-      lc0_adjusted2 = cumulative_index2 *  lifetime_cost_0d, 
-      lc35_adjusted2 = cumulative_index2 *  lifetime_cost_35d,
-      lc50_adjusted2 = cumulative_index2 *  lifetime_cost_50d)
+    # Calculate geometric mean of inflation index
+    mutate(inflation_ave = rep(exp(mean(log(inflation_index))), nrow(.))) %>%
+    # Generate cumulative inflation indices
+    mutate(cumulative_index_i1 = IndexCPI(inflation_ave),
+      cumulative_index_i2 = IndexCPI(MultiplyCPI(inflation_ave, 2)),
+      cumulative_index_d1 = IndexCPI(MultiplyCPI(inflation_ave, -1)),
+      cumulative_index_d2 = IndexCPI(MultiplyCPI(inflation_ave, -2))
+      ) %>%
+    mutate(ac_adjusted_i1 = cumulative_index_i1 * annual_cost,
+      lc0_adjusted_i1 = cumulative_index_i1 *  lifetime_cost_0d, 
+      lc35_adjusted_i1 = cumulative_index_i1 *  lifetime_cost_35d,
+      lc50_adjusted_i1 = cumulative_index_i1 *  lifetime_cost_50d,
+      ac_adjusted_i2 = cumulative_index_i2 * annual_cost,
+      lc0_adjusted_i2 = cumulative_index_i2 *  lifetime_cost_0d, 
+      lc35_adjusted_i2 = cumulative_index_i2 *  lifetime_cost_35d,
+      lc50_adjusted_i2 = cumulative_index_i2 *  lifetime_cost_50d,
+      ac_adjusted_d1 = cumulative_index_d1 * annual_cost,
+      lc0_adjusted_d1 = cumulative_index_d1 *  lifetime_cost_0d, 
+      lc35_adjusted_d1 = cumulative_index_d1 *  lifetime_cost_35d,
+      lc50_adjusted_d1 = cumulative_index_d1 *  lifetime_cost_50d,
+      ac_adjusted_d2 = cumulative_index_d2 * annual_cost,
+      lc0_adjusted_d2 = cumulative_index_d2 *  lifetime_cost_0d, 
+      lc35_adjusted_d2 = cumulative_index_d2 *  lifetime_cost_35d,
+      lc50_adjusted_d2 = cumulative_index_d2 *  lifetime_cost_50d)
   
   # Generate parameter sets for all simulations --------------------------------
   paramsSets <- list()
@@ -495,16 +509,29 @@ if (!loadParameters) {
       tempCosts <- tempParams  %>% 
         select(simset, year, inflation_index, annual_cost, lifetime_cost_0d, 
           lifetime_cost_35d, lifetime_cost_50d) %>%
-        mutate(cumulative_index = IndexCPI(inflation_index),
-          cumulative_index2 = IndexCPI(MultiplyCPI(inflation_index, 2))) %>%
-        mutate(ac_adjusted = cumulative_index * annual_cost,
-          lc0_adjusted = cumulative_index *  lifetime_cost_0d, 
-          lc35_adjusted = cumulative_index *  lifetime_cost_35d,
-          lc50_adjusted = cumulative_index *  lifetime_cost_50d,
-          ac_adjusted2 = cumulative_index2 * annual_cost,
-          lc0_adjusted2 = cumulative_index2 *  lifetime_cost_0d, 
-          lc35_adjusted2 = cumulative_index2 *  lifetime_cost_35d,
-          lc50_adjusted2 = cumulative_index2 *  lifetime_cost_50d)
+        mutate(inflation_ave = rep(exp(mean(log(inflation_index))), nrow(.))) %>%
+        # Generate cumulative inflation indices
+        mutate(cumulative_index_i1 = IndexCPI(inflation_ave),
+          cumulative_index_i2 = IndexCPI(MultiplyCPI(inflation_ave, 2)),
+          cumulative_index_d1 = IndexCPI(MultiplyCPI(inflation_ave, -1)),
+          cumulative_index_d2 = IndexCPI(MultiplyCPI(inflation_ave, -2))
+        ) %>%
+        mutate(ac_adjusted_i1 = cumulative_index_i1 * annual_cost,
+          lc0_adjusted_i1 = cumulative_index_i1 *  lifetime_cost_0d, 
+          lc35_adjusted_i1 = cumulative_index_i1 *  lifetime_cost_35d,
+          lc50_adjusted_i1 = cumulative_index_i1 *  lifetime_cost_50d,
+          ac_adjusted_i2 = cumulative_index_i2 * annual_cost,
+          lc0_adjusted_i2 = cumulative_index_i2 *  lifetime_cost_0d, 
+          lc35_adjusted_i2 = cumulative_index_i2 *  lifetime_cost_35d,
+          lc50_adjusted_i2 = cumulative_index_i2 *  lifetime_cost_50d,
+          ac_adjusted_d1 = cumulative_index_d1 * annual_cost,
+          lc0_adjusted_d1 = cumulative_index_d1 *  lifetime_cost_0d, 
+          lc35_adjusted_d1 = cumulative_index_d1 *  lifetime_cost_35d,
+          lc50_adjusted_d1 = cumulative_index_d1 *  lifetime_cost_50d,
+          ac_adjusted_d2 = cumulative_index_d2 * annual_cost,
+          lc0_adjusted_d2 = cumulative_index_d2 *  lifetime_cost_0d, 
+          lc35_adjusted_d2 = cumulative_index_d2 *  lifetime_cost_35d,
+          lc50_adjusted_d2 = cumulative_index_d2 *  lifetime_cost_50d)
       
       costingSets <- bind_rows(costingSets, tempCosts)
       
