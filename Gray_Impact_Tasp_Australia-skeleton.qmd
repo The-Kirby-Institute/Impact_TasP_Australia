@@ -1657,21 +1657,24 @@ over 2009-2019 on the number of new infections and HIV related healthcare costs.
 Using a simple HIV transmission model incorporating the effects of ART, PrEP,
 and changes in sexual behaviour we showed that increasing ART use during the
 period when early initiation of treatment and treatment as prevention became
-established could have averted a substantial number of new infections ( `r`
+established could have averted a substantial number of new infections ( 
+`r FormatData((scenarioResultsBest %>% group_by(scenario) %>% summarise(infections = sum(newInfects)))$infections %>% diff(), quantile(avertedInfects$averted, probs = lprob),  quantile(avertedInfects$averted, probs = uprob), places = 0, rangestr = "95% PI: ")`
 decrease in cumulative infections compared to a no ART increase scenario) and be
 cost saving.
 
 While the cost-effectiveness of treatment as prevention has been evaluated in
-previous studies we believe this is the first analysis done for Australia. In
-the majority of previous studies the results were obtained from future
-projections simulated by a model or were trial based.\[refs\] In contrast we
-conducted a retrospective analysis comparing the results from a baseline
-scenario which incorporated data on the actual changes in prevention and
-treatment since 2009 to a counterfactual scenario where the proportion of people
-with HIV using ART did not increase. Our results are consistent with previous
-cost-effectiveness analyses of early initiation of ART and treatment as
-prevention providing confirmation of those results and show the benefits to
-Australia.
+previous studies we believe this is the first costing analysis done for
+Australia. In the majority of previous studies the results were obtained from
+future projections simulated by a model or were trial based.
+[@granich_expanding_2012;
+@kahn_cost-effectiveness_2011; @long_initiating_2017; @eaton_health_2014;
+@jansson_predicting_2013] In contrast we conducted a retrospective analysis
+comparing the results from a baseline scenario which incorporated data on the
+actual changes in prevention and treatment since 2009 to a counterfactual
+scenario where the proportion of people with HIV using ART did not increase. Our
+results are consistent with previous cost-effectiveness analyses of early
+initiation of ART and treatment as prevention providing confirmation of those
+results and show the benefits to Australia.
 
 Given the simplicity of our analysis some caution is required when interpreting
 our results. Several assumptions were used to simplify the calculations. For
@@ -1686,15 +1689,19 @@ rather than for all populations affected by HIV. Our analysis could easily be
 expanded to include other populations if data were available. In all likelihood
 including other populations would not change the conclusions of our results and
 only change the magnitude of the costs and benefits. The specifications of the
-counterfactual scenario where there was no increase in ART proportion since `r`
+counterfactual scenario where there was no increase in ART proportion since 
+`r project$projectVars$indexYearART`
 could also affect the results. Varying the time the change occurred or
-incorporating the trends in this proportion prior to `r` would result in
+incorporating the trends in this proportion prior to
+`r project$projectVars$indexYearART` 
+would result in
 different outcomes for new infections, healthcare costs and lifetime care and
 treatment costs. However, the differences with the baseline for each of these
 would scale proportionally meaning there would be little change to primary
 outcomes of the analyses. The main limitation is the lack of accurate
-retrospective cost data for ART and how these costs changed prior to `r` . We
-conducted a scenario analysis to cover the potential effects of changes to
+retrospective cost data for ART and how these costs changed prior to 
+`r project$projectVars$indexYearART`
+. We conducted a scenario analysis to cover the potential effects of changes to
 treatment costs for those living with HIV over 2009-2019 and lifetime care and
 treatment costs for those newly infected. Even if we take the most expensive
 treatment cost scenario and the least expensive lifetime cost scenario the
@@ -1709,8 +1716,8 @@ achieving viral suppression as soon as possible after infection. Achieving high
 ART coverage among all populations affected by HIV is key to maximizing the
 benefits of U=U and would be cost saving. It will be important to ensure
 continued access to HIV treatment during the COVID-19 era. The use of injectable
-and long acting antiretroviral drugs \[refs\] which our now becoming available
-will likely enhance access to ART though the overall healthcare cost
+and long acting antiretroviral drugs [@bares_new_2022] which are now becoming
+available will likely enhance access to ART though the overall healthcare cost
 implications in Australia will need to be assessed.
 
 ## Conflicts of Interest
@@ -1718,6 +1725,8 @@ implications in Australia will need to be assessed.
 None to declare.
 
 ## Acknowledgements
+
+
 
 ## References
 
