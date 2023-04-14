@@ -1572,7 +1572,27 @@ HIV costs for each discounting and inflation scenario."
 
 **Abstract Results**:
 
-We estimate that increasing ART use since 2011 resulted in ....
+We estimate that increasing ART use since 
+`r project$projectVars$indexYearART` 
+averted an additional 
+`r FormatData((scenarioResultsBest %>% group_by(scenario) %>% summarise(infections = sum(newInfects)))$infections %>% diff(), quantile(avertedInfects$averted, probs = lprob),  quantile(avertedInfects$averted, probs = uprob), places = 0, rangestr = "95% PI: ")`
+over 2009-2019. Without the increase in ART the number of people with HIV would
+have increased from
+`r Format2019("base", "infected", rangestr = "95% PI: ")`
+to
+`r Format2019("scenario", "infected", rangestr = "95% PI: ")`
+by 2019. This results in an increase in the care and treatment costs for people
+with HIV during 2009-2019 of
+`r FormatCostDiffs("hc_base", flip = -1, rangestr = "95% PI: ", scale = 6)`
+million AUD (assuming no change in annual healthcare costs). This increase is
+offset by a decrease in the lifetime HIV costs (with 3.5% discounting) of those
+newly infected of
+`r FormatCostDiffs("lc35", rangestr = "95% PI: ", scale = 6)` 
+million AUD
+resulting in a net cost saving of 
+`r  FormatData((abs(costDifferencesBest$lc35) - abs(costDifferencesBest$hc_base)) / (10^6), quantile((abs(costDifferencesSims$lc35) - abs(costDifferencesSims$hc_base)) / (10^6), probs = lprob), quantile((abs(costDifferencesSims$lc35) - abs(costDifferencesSims$hc_base)) / (10^6), probs = uprob), places = 0, prefix = "$", rangestr = "95%: ")`
+million AUD . This cost saving was maintained across various inflationary
+costing scenarios.
 
 **Main results**
 
