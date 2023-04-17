@@ -69,31 +69,30 @@ captions.
 **Background**: Several clinical trails have established that effective
 treatment for HIV reduces morbidity and mortality and prevents transmission.
 This has resulted in changes in treatment guidelines and the concepts of
-"Treatment as Prevention" and "Undetectable equals Untransmissible (U=U)". We
-conducted an analysis of the epidemiological and healtcare cost impact of ... in
+"Treatment-as-Prevention" and "Undetectable equals Untransmissible (U=U)". We
+analysed the impact of increased ART on HIV epidemiology and healtcare costs in
 Australia.
 
 **Methods**: We conducted a retrospective modelling analysis in Australia over
 the 2009-2019 period to calculate the potential impact of early initiation of
-ART and treatment as prevention on HIV among gay and bisexual men who have sex
-with men (GBMSM). We used a difference equation model that incorporates the
-change in the proportion diagnosed, treated, and virally suppressed as well as
-the scale-up of oral HIV pre-exposure prophylaxis (PrEP) and the change in
-sexual behaviour during this period. Data from national surveillance,
-behavioural survey, and clinical cohorts was used to estimate model inputs.
-Using the model we simulated a baseline scenario for the period validated
-against available epidemiological data and a no ART increase scenario where the
-proportion on ART remains at the 2011 level to assess the impact of early
-initiation and treatment as prevention. We also conduced a costing analysis for
-each scenario from a national health provider perspective using published HIV
-healthcare cost estimates in 2019 AUD and retrospective consting scenarios
-reflecting inflationary and deflationary changes in care and treatment costs
-since 2009.
+ART and treatment as prevention on HIV among gay and bisexual men (GBM). We used
+a difference equation model that incorporates the change in the proportion
+diagnosed, treated, and virally suppressed as well as the scale-up of oral HIV
+pre-exposure prophylaxis (PrEP) and the change in sexual behaviour during this
+period. Data from national surveillance, behavioural survey, and clinical
+cohorts was used to estimate model inputs. Using the model we simulated a
+baseline scenario for the period validated against available epidemiological
+data and a no ART increase scenario where the proportion on ART remains at the
+2011 level to assess the impact of early initiation and treatment as prevention.
+We also conduced a costing analysis for each scenario from a national health
+provider perspective using published HIV healthcare cost estimates in 2019 AUD
+and retrospective costing scenarios reflecting inflationary and deflationary
+changes in care and treatment costs since 2009.
 
 **Results**: **In Results section of main text so that calculated numbers can be
 extracted**
 
-**Conclusions**: Increasing the proportion of Australian GBMSM on effective ART
+**Conclusions**: Increasing the proportion of Australian GBM on effective ART
 during 2009-2019 likely resulted in substantial reductions in new HIV infections
 and cost savings to the healthcare system. 
 
@@ -114,8 +113,8 @@ diagnosis.[@noauthor_initiation_2015; @noauthor_trial_2015;
 results formed the basis for the concept that "Undetectable equals
 Untransmissible" or U=U.[@hiv_uu_2017] Treatment as prevention is now a key
 prevention strategy and a crucial component for the HIV response internationally
-and in Australia. It underpins the UNAIDS 95-95-95 HIV cascade targets and the goal of ending
-AIDS by 2030.[@unaids_danger_2022; @institute_hiv_2022;
+and in Australia. It underpins the UNAIDS 95-95-95 HIV cascade targets and the
+goal of ending AIDS by 2030.[@unaids_danger_2022; @institute_hiv_2022;
 @noauthor_90-90-90_2014]
 
 Following the publication of the interim results from the seminal HPTN 052 trial
@@ -126,11 +125,16 @@ treatment as prevention.[@granich_expanding_2012; @kahn_cost-effectiveness_2011;
 @long_initiating_2017; @eaton_health_2014] These studies generally conducted
 scenario analyses to project the future impact of ART and showed that early
 initiation would reduce new HIV infections and associated HIV care and treatment
-costs. One study for Australia modelled the population level impact of increased
-testing and treatment. [@jansson_predicting_2013] However, we are not aware of
-any retrospective studies of the impact and cost effectiveness of increasing ART
-in Australia following changes in guidelines to recommend earlier initiation of
-ART.
+costs. For Australia, one study modelled the potential population level impact of
+increased testing and treatment.[@jansson_predicting_2013] Another longitudinal
+cohort study using routine health record data extracted from health services
+that provide HIV diagnosis and care to gay and bisexual men (GBM) in the
+Australian states of New South Wales and Victoria reported substantial
+population-level reductions in HIV incidence due to treatment-as-prevention.
+[@callander_hiv_2023] However, we are not aware of any retrospective studies
+estimating the national population level impact and cost effectiveness of
+increasing ART in Australia following changes in guidelines to recommend earlier
+initiation of ART.
 
 As the evidence for the benefits of the early initiation of ART became apparent,
 HIV treatment guidelines in Australia changed. In 2007, guidelines started
@@ -144,7 +148,7 @@ after the release of the START trial results.[@noauthor_initiation_2015] Prior
 to 2015, Australian HIV treatment recommendations provided qualified support for
 the initiation of ART in all people with HIV but with a consideration of risks
 and benefits. Despite these qualifications it is likely that international
-guidelines would have influenced clinician and patient decision making, meaning
+guidelines influenced clinician and patient decision making, meaning
 changes in treatment initiation at the population level likely occurred prior to
 2015.
 
