@@ -23,11 +23,11 @@ periodically.
 ### Code summary and manuscript
 
 The code for the project calculations has been incorporated into a Quarto
-(version) markdown document `Impact_Tasp_Australia-skeleton.qmd`. This document
-forms a skeleton manuscript for submission to a peer-reviewed journal and is in
-some ways a preprint. All the materials required to run the markdown script to
-reproduce the manuscript results and figures are included in this repository
-including the references and CSL file.
+(version 1.3.326) markdown document `Impact_Tasp_Australia-skeleton.qmd`. This
+document forms a skeleton manuscript for submission to a peer-reviewed journal
+and is in some ways a preprint. All the materials required to run the markdown
+script to reproduce the manuscript results and figures are included in this
+repository including the references and CSL file. 
 
 Cleaned data inputs used for the calculations and the final results are
 available in the `output` directory. The script reads in two `.csv` input files
