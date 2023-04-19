@@ -289,7 +289,7 @@ if (!loadProject) {
       "prop_condom_range" = "Range in condom use",
       "diagnosed_os_range" = "Range in diagnoses from overseas", 
       "diagnoses_range" = "Range in diagnoses",
-      "inflation_index_factor" = "Inflation index factor (adjustment of annual CPI)", 
+      "inflation_index_factor" = "Inflation index factor (adjustment of annual CPI)" 
     ) 
     
     paramsFixed <- tibble(
@@ -856,19 +856,18 @@ remaining at a similar price while others increased or decreased over the
 Given the unclear data for ART drug costs over time we considered several
 inflationary and deflationary scenarios for the change in costs over 2009-2019.
 For the base case we assumed there was no change in costs over 2009-2019 (no
-inflation sceanrio), so the cost of care and treatment for people living with
+inflation scenario), so the cost of care and treatment for people living with
 HIV in 2009 was the same as for 2019. The other scenarios were based on the
 geometric mean of the annual CPI inflation rates over 2009-2019 obtained from
-the Australian Bureau of Statistics. [@noauthor_consumer_2023]
-
-This mean inflation rate $I_R$ was used as a base factor to define the costing
-scenarios. Two of these scenarios were inflationary with the cost of HIV care
-and treatment over 2009-2019 increasing annually at $I_R$ (Inflation 1 scenario)
-and $2 \times I_R$ (Inflation 2 scenario) and two scenarios were deflationary
-with the annual HIV costs decreasing by $I_R$ (Deflation 1 scenario) and
-$2 \times I_R$ (Deflation 2 scenario) each year. Using the specified annual
-inflation/deflation rates we were then able to adjust the lifetime and annual
-costs in 2019 AUD to obtain costs for each year from 2009 to 2018.
+the Australian Bureau of Statistics. [@noauthor_consumer_2023] This mean
+inflation rate $I_R$ was used as a base factor to define the costing scenarios.
+Two of these scenarios were inflationary with the cost of HIV care and treatment
+over 2009-2019 increasing annually at $I_R$ (Inflation 1 scenario) and $2 \times
+I_R$ (Inflation 2 scenario) and two scenarios were deflationary with the annual
+HIV costs decreasing by $I_R$ (Deflation 1 scenario) and $2 \times I_R$
+(Deflation 2 scenario) each year. Using the specified annual inflation/deflation
+rates we were then able to adjust the lifetime and annual costs in 2019 AUD to
+obtain costs for each year from 2009 to 2018.
 
 For each costing scenario we calculated the total cost of providing ART to
 people on treatment by multiplying the number on treatment by the annual
@@ -925,12 +924,12 @@ calculations take samples from these ranges assuming a uniform distribution.
 1.  Estimates for the number of GBM with HIV over 2009-2019 were obtained using
 the HIV cascade methodology used for national surveillance.[@institute_hiv_2022]
 The 2009 estimate was as the initial conditions for the model calculations with
-the remaining estimates used for validation.
+the remaining estimates used for validation (see @tbl-table2).
 
 2.  This value was calculated using Eq. @eq-incidence, the fixed input
-parameters, the time-varying parameter values for the year 2009, and the initial
-values of people with HIV and the number of notifications (excluding those
-previously diagnosed overseas) reported in national
+parameters, the time-varying parameter values for the year 2009 in @tbl-table2,
+and the initial values of people with HIV and the number of notifications
+(excluding those previously diagnosed overseas) reported in national
 surveillance.[@institute_hiv_2022] This value was then constant over the
 calculation period.
 
@@ -966,7 +965,8 @@ certainty range specifies the multiplicative factor used to generate uncertainty
 estimates. Endnotes provide references and justifications. The values for PLHIV 
 and diagnoses after 2009 are not used in the calculations, rather they are used 
 for validation."
-
+# Note the assumed uncertainty and notes number needs to be entered manually. 
+# The whole table then needs to be reformated. 
 ```
 
 ```{r Table2}
@@ -979,7 +979,36 @@ knitr::kable(table2, row.names = FALSE,
   caption = "Caption for cross-ref delete {#tbl-table2}")
 ```
 
-1. 
+1. Estimates for the number of GBM with HIV over 2009-2019 and the proportion
+diagnosed were estimated using the methodology for producing the Australian HIV
+cascade for national surveillance.[@institute_hiv_2022]
+
+2. The proportion of diagnosed GBM taking ART was obtained from gay community
+periodic surveys (GCPS) results reported in the Annual Trends in Behaviour
+report.[@mao_l_annual_2022]
+
+3. The proportion of GBM taking ART with suppressed virus was estimated using
+data from the Australian Observational HIV Database (AHOD) for GBM.
+[@noauthor_australian_2020] This is the same data used for viral suppression in
+the Australian HIV cascade.
+
+4. The proportion of GBM taking HIV PrEP was assumed to be zero before 2013.
+After 2013 we used the proportion eligible for PrEP multiplied by the proportion
+eligible taking PrEP as reported in the Annual Trends in Behaviour
+report.[@mao_l_annual_2022]
+
+5. The proportion of GBM using condoms was given by the proportion reporting consistent 
+condom use in the Annual Trends in Behaviour report and Holt et al.
+[@mao_l_annual_2022; @holt_adapting_2016]
+
+6. The number of notifications for HIV in Australia as reported in national
+surveillance was assumed to equal the number of diagnoses each year.
+[@institute_hiv_2022] The notifications were split into those for people
+previously diagnosed overseas and those or people first diagnosed in Australia.
+
+7. The inflation index is the annual consumer price index (CPI) reported by the
+Australian Bureau of Statistics represented as a multiplicative factor.
+[@noauthor_consumer_2023] 
 
 \newpage
 
