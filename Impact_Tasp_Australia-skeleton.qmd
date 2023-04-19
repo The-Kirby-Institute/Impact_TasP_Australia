@@ -956,13 +956,16 @@ al.[@lim_lifetime_2022]
 ```{r Format time varying parameters}
 table2 <- parametersVar %>%
   gather(key = var_name, value = value, 2:ncol(.)) %>% 
-  spread(key = names(.)[1],value = 'value') %>%
+  spread(key = "year", value = 'value') %>%
   mutate("Assumed uncertainty range" = NA,
-    "References" = NA) 
+    "Notes" = NA) %>%
+  arrange(factor(var_name, names(parametersVar)[2:ncol(parametersVar)], levels = names(parametersVar)[2:ncol(parametersVar)]))
 
-table2Caption <- "Time varying input parameter estimates. Endnotes provide
-references and justifications. The values for PLHIV and diagnoses after 2009 are 
-not used in the calculations, rather they are used for validation."
+table2Caption <- "Time varying input parameter estimates. The assumed
+certainty range specifies the multiplicative factor used to generate uncertainty 
+estimates. Endnotes provide references and justifications. The values for PLHIV 
+and diagnoses after 2009 are not used in the calculations, rather they are used 
+for validation."
 
 ```
 
