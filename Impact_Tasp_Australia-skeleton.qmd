@@ -1081,6 +1081,7 @@ figRowWidth <- 8/2.5
 # Extract results --------------------------------------------------------------
 validationData <- paramsBest %>% select(year, plhiv, diagnoses)
 
+
 plhivPlot <- ggplot(data = resultsSims, 
   aes(x = year, y = infected, group = simset)) + 
   geom_line(aes(colour = "sims")) +
@@ -1448,15 +1449,20 @@ if (savePlots) {
   
 }
 
-combinedPlotCaption <- "Summary of results from the baseline and no ART increase scenarios. (A) 
-Number of people living with HIV over 2009-2019. (B) Annual number of new infections of HIV 
-over 2009-2019. (C) Distribution in the total number of infections during the 2009-2019 period. 
-(D) Median and 95% percentile range from across all simulations for the additional costs 
-in providing ART compared to the no ART increase scenario and the reduction in lifetime care and ART costs."
+combinedPlotCaption <- "Summary of results from the baseline and no ART increase 
+scenarios. (A) Number of people living with HIV over 2009-2019. (B) Annual 
+number of new infections of HIV over 2009-2019. (C) Distribution in the total 
+number of infections during the 2009-2019 period. (D) Median and 95% percentile 
+range from across all simulations for the additional costs in providing ART 
+compared to the no ART increase scenario and the reduction in lifetime care and 
+ART costs."
 
-validationPlotCaption <- "Comparison of baseline sceanrio results to available data. (A) Number of 
-people living with HIV over 2009-2019 from all simulations compared to estimates from the 
-Australian HIV cascade (black discs). (B) Annual number of new infections over 2009-2019 from all simulations compared to reported notifications of HIV in MSM (excluding those previoulsy diagnosed overseas). "
+validationPlotCaption <- "Comparison of baseline sceanrio results to available 
+data. (A) Number of people living with HIV over 2009-2019 from all simulations 
+compared to estimates from the Australian HIV cascade (black discs). (B) Annual 
+number of new infections over 2009-2019 from all simulations compared to 
+reported notifications of HIV in MSM (excluding those previoulsy diagnosed 
+overseas). "
 
 # Create a formatted summary results table for manuscript ----------------------
 
@@ -1824,16 +1830,25 @@ print(combinedPlot)
 
 ## Supplementarty Material
 
-### Validation of calculations
+Supplement to: Richard T. Gray. Impact of increased ART use during the treatment
+as prevention era in Australia
+
+### Section S1: Validation of calculations
 
 ```{r Figure S1}
 #| label: fig-figureS1
 #| include: true
-#| fig-cap: !expr combinedPlotCaption
+#| fig-cap: !expr validationPlotCaption
 #| fig-cap-location: top # Doesn't seem to work
 #| fig-width: !expr figWidth
 #| fig-height: !expr 2*figRowWidth
 print(validationPlot)
 ```
 
-### Retrospective adjustement of cost ings for 20-19
+### Section S2: Retrospective HIV treatment costs
+
+Table S1: 
+
+
+Table S2: 
+
