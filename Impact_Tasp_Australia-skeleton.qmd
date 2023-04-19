@@ -698,8 +698,7 @@ transmission given by a factor $(1-\epsilon_{ART})$. The concept of undetectable
 equalling transmittable or U=U is based on the the efficacy of viral suppression
 $\epsilon_{ART}$ being 100%. However, at the population level where there might
 not be perfect adherence and viral blips can occur this efficacy will be high
-but less than 100%.\[@cohen_antiretroviral_2016\] We assumed $\epsilon_{ART}$
-was
+but less than 100%.[@cohen_antiretroviral_2016] We assumed $\epsilon_{ART}$ was
 `r FormatPercent(100*(parametersFixed %>% filter(code_variable == "effart"))$estimate, places =0)`
 with range of
 `r FormatData(100*(parametersFixed %>% filter(code_variable == "effart"))$lower, places =0)` -
@@ -714,7 +713,7 @@ If a proportion $p_t$ of the susceptible population is taking PrEP in year $t$
 then there will be a similar reduction in $\beta$ due to the efficacy of PrEP
 \[$\epsilon_{PrEP}$; assumed to be\
 `r FormatRangePercent(100*(parametersFixed %>% filter(code_variable == "effprep"))$estimate, 100*(parametersFixed %>% filter(code_variable == "effprep"))$lower, 100*(parametersFixed %>% filter(code_variable == "effprep"))$upper, places = 0)`\]
-*\[refs\]* given by $(1-p_t \epsilon_{PrEP})$.
+\[[@mccormack_pre-exposure_2016]\] given by $(1-p_t \epsilon_{PrEP})$.
 
 To consider the effects of changes in sexual behaviour and the impact of other
 prevention strategies on transmission over time we incorporated the effect of
@@ -842,15 +841,17 @@ Pharmaceuticals Benefits Scheme application. The estimated costs for each line
 of ART compared to the Lim et al analysis are shown in Table S1 in the
 Supplementary material.[@lim_lifetime_2022] Since 2013, the cost of first line
 therapy has remained relatively constant while higher lines of ART have fallen
-in price. 
+in price.
 
 We lacked overall cost data prior to 2013. To assess changes in price since
 2009, we reviewed data from the Australian Statistics of Medicine reports which
 are available up to 2015.[@care_pharmaceutical_nodate] These reports provide the
-total cost and the number of packs (2011 and prior) or scripts dispensed (from 2012) of individual drugs. The change in reporting from packs to scripts 
-makes it difficult to determine any trend in price over the 2009-2015 period. 
-Looking at key drugs that formed part of ART regimens showed varying trends with
-some remaining at a similar price while others increased or decreased over the 2009-2011 and 2012-2014 periods (see Table S2).
+total cost and the number of packs (2011 and prior) or scripts dispensed (from
+2012) of individual drugs. The change in reporting from packs to scripts makes
+it difficult to determine any trend in price over the 2009-2015 period. Looking
+at key drugs that formed part of ART regimens showed varying trends with some
+remaining at a similar price while others increased or decreased over the
+2009-2011 and 2012-2014 periods (see Table S2).
 
 Given the unclear data for ART drug costs over time we considered several
 inflationary and deflationary scenarios for the change in costs over 2009-2019.
@@ -864,8 +865,8 @@ This mean inflation rate $I_R$ was used as a base factor to define the costing
 scenarios. Two of these scenarios were inflationary with the cost of HIV care
 and treatment over 2009-2019 increasing annually at $I_R$ (Inflation 1 scenario)
 and $2 \times I_R$ (Inflation 2 scenario) and two scenarios were deflationary
-with the annual HIV costs decreasing by $I_R$ (Deflation 1 scenario) and $2
-\times I_R$ (Deflation 2 scenario) each year. Using the specified annual
+with the annual HIV costs decreasing by $I_R$ (Deflation 1 scenario) and
+$2 \times I_R$ (Deflation 2 scenario) each year. Using the specified annual
 inflation/deflation rates we were then able to adjust the lifetime and annual
 costs in 2019 AUD to obtain costs for each year from 2009 to 2018.
 
@@ -890,26 +891,26 @@ people living with HIV initiate ART irrespective of CD4. While the Australian
 guidelines did not fully adapt the US DHHS recommendation, it was influential on
 clinical practice and there were recommendations to consider ART for all people
 with HIV including those with CD4 above 500 from 2013. In this year the
-estimated percentage of all GBM on ART was 
-`r FormatPercent(100*(parametersVar %>% filter(year == project$projectVars$indexYearART))$prop_diagnosed, places = 1)` 
-and in our counter-factual scenario we assumed this percentage was fixed
-from 2011 to 2019.
+estimated percentage of all GBM on ART was
+`r FormatPercent(100*(parametersVar %>% filter(year == project$projectVars$indexYearART))$prop_diagnosed, places = 1)`
+and in our counter-factual scenario we assumed this percentage was fixed from
+2011 to 2019.
 
 #### Model outputs
 
 Results were obtained for the best estimate inputs and from summary statistics
 for the all simulations. Total costs are in 2019 AUD and rounded to the nearest
-A\$1 million. All analyses and results were generated using R version
-4.2.2 with reproducible code available in an open access repository along with
-input parameters and the final results \[ref Github\].
+A\$1 million. All analyses and results were generated using R version 4.2.2 with
+reproducible code available in an open access repository along with input
+parameters and the final results \[ref Github\].
 
 **Table 1** - Fixed input parameter estimates and ranges. Endnotes provide
 justifications for these parameter values. The simulations used for the
 calculations take samples from these ranges assuming a uniform distribution.
 
 | Parameter                       | Description                                                                                                                                                                                                                                                                                                                                                  | Estimate and Range                                                                                                                                                                                                                                                        | Notes |
-|------------|---------------------------------|------------------------|------------|
-| $N(0)$                          | Number of people living with HIV in 2009                                                                                                                                                                                                                                                                                                                     | `r FormatData(parametersVar$plhiv[1], parametersVar$plhiv[1]*(parametersFixed %>% filter(code_variable == "plhiv_range"))$lower, parametersVar$plhiv[1]*(parametersFixed %>% filter(code_variable == "plhiv_range"))$upper, places = 0)`                                  | 1     |
+|----------------|----------------------------|--------------------|----------------|
+| $N(0)$                          | Number of GBM living with HIV in 2009                                                                                                                                                                                                                                                                                                                        | `r FormatData(parametersVar$plhiv[1], parametersVar$plhiv[1]*(parametersFixed %>% filter(code_variable == "plhiv_range"))$lower, parametersVar$plhiv[1]*(parametersFixed %>% filter(code_variable == "plhiv_range"))$upper, places = 0)`                                  | 1     |
 | **HIV transmission parameters** |                                                                                                                                                                                                                                                                                                                                                              |                                                                                                                                                                                                                                                                           |       |
 | $\beta$                         | Annual probability an untreated person transmits HIV to another person                                                                                                                                                                                                                                                                                       | Calculated using initial values                                                                                                                                                                                                                                           | 2     |
 | $\epsilon_{ART}$                | Efficacy of ART in preventing HIV transmission if virus is suppressed                                                                                                                                                                                                                                                                                        | `r FormatData((parametersFixed %>% filter(code_variable == "effart"))$estimate, (parametersFixed %>% filter(code_variable == "effart"))$lower, (parametersFixed %>% filter(code_variable == "effart"))$upper)`                                                            | 3     |
@@ -917,23 +918,36 @@ calculations take samples from these ranges assuming a uniform distribution.
 | $\epsilon_{condom}$             | Efficacy of condoms in preventing HIV transmission                                                                                                                                                                                                                                                                                                           | `r FormatData((parametersFixed %>% filter(code_variable == "effcondom"))$estimate, (parametersFixed %>% filter(code_variable == "effcondom"))$lower, (parametersFixed %>% filter(code_variable == "effcondom"))$upper)`                                                   | 5     |
 | **HIV treatment costs**         |                                                                                                                                                                                                                                                                                                                                                              |                                                                                                                                                                                                                                                                           |       |
 | $c_{ART}$                       | Average annual cost of providing care and ART in 2019 AUD                                                                                                                                                                                                                                                                                                    | `r FormatData((parametersFixed %>% filter(code_variable == "annual_cost"))$estimate, (parametersFixed %>% filter(code_variable == "annual_cost"))$lower, (parametersFixed %>% filter(code_variable == "annual_cost"))$upper, places = 0, prefix = "$")`                   | 6     |
-| $c^0_{life}$                    | Undiscounted lifetime cost of providing care and ART post infection in 2019 AUD                                                                                                                                                                                                                                                                              | `r FormatData((parametersFixed %>% filter(code_variable == "lifetime_cost_0d"))$estimate, (parametersFixed %>% filter(code_variable == "lifetime_cost_0d"))$lower, (parametersFixed %>% filter(code_variable == "lifetime_cost_0d"))$upper, places = 0, prefix = "$")`    | 7     |
-| $c^{3.5}_{life}$                | Lifetime cost of providing care and ART post infection in 2019 AUD discounted 3.5% `r FormatData((parametersFixed %>% filter(code_variable == "lifetime_cost_35d"))$estimate, (parametersFixed %>% filter(code_variable == "lifetime_cost_35d"))$lower, (parametersFixed %>% filter(code_variable == "lifetime_cost_35d"))$upper, places = 0, prefix = "$")` | 7                                                                                                                                                                                                                                                                         |       |
-| $c^5_{life}$                    | Lifetime cost of providing care and ART post infection in 2019 AUD discounted 5%                                                                                                                                                                                                                                                                             | `r FormatData((parametersFixed %>% filter(code_variable == "lifetime_cost_50d"))$estimate, (parametersFixed %>% filter(code_variable == "lifetime_cost_50d"))$lower, (parametersFixed %>% filter(code_variable == "lifetime_cost_50d"))$upper, places = 0, prefix = "$")` | 7     |
+| $c^0_{life}$                    | Annual cost of providing care and ART post infection in 2019 AUD                                                                                                                                                                                                                                                                              | `r FormatData((parametersFixed %>% filter(code_variable == "lifetime_cost_0d"))$estimate, (parametersFixed %>% filter(code_variable == "lifetime_cost_0d"))$lower, (parametersFixed %>% filter(code_variable == "lifetime_cost_0d"))$upper, places = 0, prefix = "$")`    | 7     |
+| $c^{3.5}_{life}$                | Undiscounted lifetime cost of providing care and ART post infection in 2019 AUD | `r FormatData((parametersFixed %>% filter(code_variable == "lifetime_cost_35d"))$estimate, (parametersFixed %>% filter(code_variable == "lifetime_cost_35d"))$lower, (parametersFixed %>% filter(code_variable == "lifetime_cost_35d"))$upper, places = 0, prefix = "$")` | 7                                                                                                                                                                                                                                                                         |       |
+| $c^5_{life}$                    | Lifetime cost of providing care and ART post infection in 2019 AUD discounted 3.5%                                                                                                                                                                                                                                                                             | `r FormatData((parametersFixed %>% filter(code_variable == "lifetime_cost_50d"))$estimate, (parametersFixed %>% filter(code_variable == "lifetime_cost_50d"))$lower, (parametersFixed %>% filter(code_variable == "lifetime_cost_50d"))$upper, places = 0, prefix = "$")` | Lifetime cost of providing HIV care and ART post infection in 2019 AUD discounted 5% | 7
 
-1.  
+1.  Estimates for the number of GBM with HIV over 2009-2019 were obtained using
+the HIV cascade methodology used for national surveillance.[@institute_hiv_2022]
+The 2009 estimate was as the initial conditions for the model calculations with
+the remaining estimates used for validation.
 
-2.  
+2.  This value was calculated using Eq. @eq-incidence, the fixed input
+parameters, the time-varying parameter values for the year 2009, and the initial
+values of people with HIV and the number of notifications (excluding those
+previously diagnosed overseas) reported in national
+surveillance.[@institute_hiv_2022] This value was then constant over the
+calculation period.
 
-3.  
+3.  The efficacy of ART was based on clinical trial results.[@noauthor_initiation_2015; @noauthor_trial_2015;
+@koenig_same-day_2017; rosen_initiating_2016; @pilcher_effect_2017]
 
-4.  
+4.  The efficacy of HIV PrEP was based on the results from the PROUD study.[@mccormack_pre-exposure_2016]
 
-5.  
+5.  The efficacy of condoms is based on the efficacy for consistent condom use
+reported by Smith et al.[@smith_condom_2015]
+ 
+6.  The estimated annual cost of providing care and treatment to people with HIV 
+in 2019 was obtained by taking the 10-year undiscounted cost reported in the 
+Lim et al study[@lim_lifetime_2022] and dividing by 10 to produce a yearly cost. 
 
-6.  
-
-7.  
+7. The lifetime HIV costs were each discounting rate were obtained from Lim et 
+al.[@lim_lifetime_2022]
 
 \newpage
 
@@ -947,8 +961,8 @@ table2 <- parametersVar %>%
     "References" = NA) 
 
 table2Caption <- "Time varying input parameter estimates. Endnotes provide
-references and justifications. The values for PLHIV and diagnoses are not used in
-the calculations, rather they are used for validation."
+references and justifications. The values for PLHIV and diagnoses after 2009 are 
+not used in the calculations, rather they are used for validation."
 
 ```
 
@@ -961,6 +975,8 @@ the calculations, rather they are used for validation."
 knitr::kable(table2, row.names = FALSE, 
   caption = "Caption for cross-ref delete {#tbl-table2}")
 ```
+
+1. 
 
 \newpage
 
