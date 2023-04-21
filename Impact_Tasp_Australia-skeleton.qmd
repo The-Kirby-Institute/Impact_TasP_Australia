@@ -57,8 +57,8 @@ The majority of the manuscript is written here to enable results to be inserted.
 The write-up of the results for the abstract is done at the start of the Results
 section. Final editing needs to be completed in the resulting Word Document file
 to finalise the manuscript. This includes moving the abstract results and
-reformatting the tables, and moving and reformatting the table and figure
-captions.
+reformatting the tables, moving and reformatting the table and figure
+captions, reformatting references etc etc. 
 
 <!--- The following code chunks set up the model and results generation for the paper--->
 
@@ -901,7 +901,7 @@ Results were obtained for the best estimate inputs and from summary statistics
 for the all simulations. Total costs are in 2019 AUD and rounded to the nearest
 A\$1 million. All analyses and results were generated using R version 4.2.2 with
 reproducible code available in an open access repository along with input
-parameters and the final results \[ref Github\].
+parameters and the final results \[@gray_kirby_nodate\].
 
 **Table 1** - Fixed input parameter estimates and ranges. Endnotes provide
 justifications for these parameter values. The simulations used for the
@@ -1472,12 +1472,13 @@ range from across all simulations for the additional costs in providing ART
 compared to the no ART increase scenario and the reduction in lifetime care and 
 ART costs."
 
-validationPlotCaption <- "Comparison of baseline sceanrio results to available 
-data. (A) Number of people living with HIV over 2009-2019 from all simulations 
-compared to estimates from the Australian HIV cascade (black discs). (B) Annual 
-number of new infections over 2009-2019 from all simulations compared to 
-reported notifications of HIV in MSM (excluding those previoulsy diagnosed 
-overseas). "
+validationPlotCaption <- "Comparison of baseline scenario results to available 
+published data. (A) Number of people living with HIV over 2009-2019 from all 
+simulations compared to estimates from the Australian HIV cascade (black discs). 
+(B) Annual number of new infections over 2009-2019 from all simulations compared 
+to reported notifications of HIV in MSM (excluding those previoulsy diagnosed 
+overseas) and estimated new infections using the relative change in the incidence 
+per 100,000 GBM from the TAIPAN study (red line)."
 
 # Create a formatted summary results table for manuscript ----------------------
 
