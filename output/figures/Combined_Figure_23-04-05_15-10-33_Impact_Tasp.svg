@@ -4197,7 +4197,7 @@
 <rect x='390.61' y='509.12' width='30.85' height='57.49' style='stroke-width: 1.07; stroke: none; stroke-linecap: square; stroke-linejoin: miter; fill: #95918C; fill-opacity: 0.50;' />
 <rect x='452.30' y='429.22' width='30.85' height='137.39' style='stroke-width: 1.07; stroke: none; stroke-linecap: square; stroke-linejoin: miter; fill: #9ACEEB; fill-opacity: 0.50;' />
 <rect x='513.99' y='477.80' width='30.85' height='88.81' style='stroke-width: 1.07; stroke: none; stroke-linecap: square; stroke-linejoin: miter; fill: #9ACEEB; fill-opacity: 0.50;' />
-<rect x='575.68' y='490.90' width='30.85' height='75.71' style='stroke-width: 1.07; stroke: none; stroke-linecap: square; stroke-linejoin: miter; fill: #9ACEEB; fill-opacity: 0.50;' />
+<rect x='575.68' y='490.90' width='30.85' height='75.71' style='stroke-width: 1.07; stroke: none; stroke-linecap: square; stroke-linejoin: miter; fill: #7F7F7F; fill-opacity: 0.50;' />
 <polyline points='398.32,495.38 413.74,495.38 ' style='stroke-width: 2.35; stroke-linecap: butt;' />
 <polyline points='406.03,495.38 406.03,521.01 ' style='stroke-width: 2.35; stroke-linecap: butt;' />
 <polyline points='398.32,521.01 413.74,521.01 ' style='stroke-width: 2.35; stroke-linecap: butt;' />

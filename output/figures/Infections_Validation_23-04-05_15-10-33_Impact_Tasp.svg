@@ -1030,6 +1030,7 @@
 <polyline points='58.18,103.51 92.61,109.77 127.04,112.92 161.48,127.77 195.91,124.79 230.34,145.20 264.77,155.02 299.21,153.76 333.64,163.34 368.07,157.24 402.50,159.30 ' style='stroke-width: 1.07; stroke: #9ACEEB; stroke-linecap: butt;' />
 <polyline points='58.18,90.67 92.61,96.83 127.04,100.07 161.48,116.96 195.91,114.42 230.34,139.14 264.77,152.62 299.21,154.72 333.64,171.50 368.07,168.06 402.50,173.65 ' style='stroke-width: 1.07; stroke: #9ACEEB; stroke-linecap: butt;' />
 <polyline points='58.18,93.55 92.61,97.58 127.04,98.56 161.48,111.77 195.91,106.69 230.34,126.42 264.77,136.51 299.21,133.55 333.64,145.04 368.07,138.60 402.50,141.26 ' style='stroke-width: 1.07; stroke: #1F75FE; stroke-linecap: butt;' />
+<polyline points='58.18,93.55 92.61,99.33 127.04,74.12 161.48,60.71 195.91,72.50 230.34,54.01 264.77,66.72 299.21,63.72 333.64,87.07 368.07,107.42 402.50,102.33 ' style='stroke-width: 1.07; stroke-linecap: butt;' />
 <circle cx='58.18' cy='93.55' r='1.95' style='stroke-width: 0.71; fill: #000000;' />
 <circle cx='92.61' cy='99.33' r='1.95' style='stroke-width: 0.71; fill: #000000;' />
 <circle cx='127.04' cy='74.12' r='1.95' style='stroke-width: 0.71; fill: #000000;' />
@@ -1041,6 +1042,18 @@
 <circle cx='333.64' cy='87.07' r='1.95' style='stroke-width: 0.71; fill: #000000;' />
 <circle cx='368.07' cy='107.42' r='1.95' style='stroke-width: 0.71; fill: #000000;' />
 <circle cx='402.50' cy='102.33' r='1.95' style='stroke-width: 0.71; fill: #000000;' />
+<polyline points='58.18,97.58 92.61,97.58 127.04,113.23 161.48,117.70 195.91,124.40 230.34,137.81 264.77,144.51 299.21,175.80 333.64,193.67 368.07,184.73 402.50,193.67 ' style='stroke-width: 1.07; stroke: #EE204D; stroke-linecap: butt;' />
+<circle cx='58.18' cy='97.58' r='1.95' style='stroke-width: 0.71; stroke: #EE204D; fill: #EE204D;' />
+<circle cx='92.61' cy='97.58' r='1.95' style='stroke-width: 0.71; stroke: #EE204D; fill: #EE204D;' />
+<circle cx='127.04' cy='113.23' r='1.95' style='stroke-width: 0.71; stroke: #EE204D; fill: #EE204D;' />
+<circle cx='161.48' cy='117.70' r='1.95' style='stroke-width: 0.71; stroke: #EE204D; fill: #EE204D;' />
+<circle cx='195.91' cy='124.40' r='1.95' style='stroke-width: 0.71; stroke: #EE204D; fill: #EE204D;' />
+<circle cx='230.34' cy='137.81' r='1.95' style='stroke-width: 0.71; stroke: #EE204D; fill: #EE204D;' />
+<circle cx='264.77' cy='144.51' r='1.95' style='stroke-width: 0.71; stroke: #EE204D; fill: #EE204D;' />
+<circle cx='299.21' cy='175.80' r='1.95' style='stroke-width: 0.71; stroke: #EE204D; fill: #EE204D;' />
+<circle cx='333.64' cy='193.67' r='1.95' style='stroke-width: 0.71; stroke: #EE204D; fill: #EE204D;' />
+<circle cx='368.07' cy='184.73' r='1.95' style='stroke-width: 0.71; stroke: #EE204D; fill: #EE204D;' />
+<circle cx='402.50' cy='193.67' r='1.95' style='stroke-width: 0.71; stroke: #EE204D; fill: #EE204D;' />
 <rect x='40.96' y='44.68' width='378.75' height='205.25' style='stroke-width: 1.07;' />
 </g>
 <g clip-path='url(#cpMC4wMHw0MjUuMjB8MC4wMHwyODMuNDY=)'>
@@ -1070,18 +1083,26 @@
 <text x='402.50' y='262.03' text-anchor='middle' style='font-size: 10.00px; font-family: "Arial";' textLength='22.26px' lengthAdjust='spacingAndGlyphs'>2019</text>
 <text x='230.34' y='275.47' text-anchor='middle' style='font-size: 12.00px; font-weight: bold; font-family: "Arial";' textLength='25.37px' lengthAdjust='spacingAndGlyphs'>Year</text>
 <text transform='translate(14.08,147.30) rotate(-90)' text-anchor='middle' style='font-size: 12.00px; font-weight: bold; font-family: "Arial";' textLength='124.01px' lengthAdjust='spacingAndGlyphs'>Annual HIV infections</text>
-<rect x='80.79' y='5.48' width='299.10' height='28.24' style='stroke-width: 1.07; stroke: none; fill: #FFFFFF;' />
-<line x1='93.98' y1='19.60' x2='107.80' y2='19.60' style='stroke-width: 1.07; stroke-linecap: butt;' />
-<line x1='93.98' y1='19.60' x2='107.80' y2='19.60' style='stroke-width: 1.07; stroke-linecap: butt;' />
-<circle cx='100.89' cy='19.60' r='1.95' style='stroke-width: 0.71; fill: #000000;' />
-<line x1='193.04' y1='19.60' x2='206.87' y2='19.60' style='stroke-width: 1.07; stroke: #1F75FE; stroke-linecap: butt;' />
-<line x1='193.04' y1='19.60' x2='206.87' y2='19.60' style='stroke-width: 1.07; stroke: #1F75FE; stroke-linecap: butt;' />
-<circle cx='199.96' cy='19.60' r='1.95' style='stroke-width: 0.71; stroke: #1F75FE; fill: #1F75FE;' />
-<line x1='284.66' y1='19.60' x2='298.48' y2='19.60' style='stroke-width: 1.07; stroke: #9ACEEB; stroke-linecap: butt;' />
-<line x1='284.66' y1='19.60' x2='298.48' y2='19.60' style='stroke-width: 1.07; stroke: #9ACEEB; stroke-linecap: butt;' />
-<circle cx='291.57' cy='19.60' r='1.95' style='stroke-width: 0.71; stroke: #9ACEEB; fill: #9ACEEB;' />
-<text x='115.51' y='23.03' style='font-size: 9.60px; font-weight: bold; font-family: "Arial";' textLength='69.83px' lengthAdjust='spacingAndGlyphs'>New diagnoses</text>
-<text x='214.57' y='23.03' style='font-size: 9.60px; font-weight: bold; font-family: "Arial";' textLength='62.38px' lengthAdjust='spacingAndGlyphs'>Best estimate</text>
-<text x='306.19' y='23.03' style='font-size: 9.60px; font-weight: bold; font-family: "Arial";' textLength='68.22px' lengthAdjust='spacingAndGlyphs'>All simulations</text>
+<rect x='34.38' y='5.48' width='391.92' height='28.24' style='stroke-width: 1.07; stroke: none; fill: #FFFFFF;' />
+<line x1='47.57' y1='19.60' x2='61.39' y2='19.60' style='stroke-width: 1.07; stroke-linecap: butt;' />
+<line x1='47.57' y1='19.60' x2='61.39' y2='19.60' style='stroke-width: 1.07; stroke-linecap: butt;' />
+<circle cx='54.48' cy='19.60' r='1.95' style='stroke-width: 0.71; fill: #000000;' />
+<circle cx='54.48' cy='19.60' r='1.95' style='stroke-width: 0.71; fill: #000000;' />
+<line x1='146.64' y1='19.60' x2='160.46' y2='19.60' style='stroke-width: 1.07; stroke: #EE204D; stroke-linecap: butt;' />
+<line x1='146.64' y1='19.60' x2='160.46' y2='19.60' style='stroke-width: 1.07; stroke: #EE204D; stroke-linecap: butt;' />
+<circle cx='153.55' cy='19.60' r='1.95' style='stroke-width: 0.71; stroke: #EE204D; fill: #EE204D;' />
+<circle cx='153.55' cy='19.60' r='1.95' style='stroke-width: 0.71; stroke: #EE204D; fill: #EE204D;' />
+<line x1='239.45' y1='19.60' x2='253.28' y2='19.60' style='stroke-width: 1.07; stroke: #1F75FE; stroke-linecap: butt;' />
+<line x1='239.45' y1='19.60' x2='253.28' y2='19.60' style='stroke-width: 1.07; stroke: #1F75FE; stroke-linecap: butt;' />
+<circle cx='246.37' cy='19.60' r='1.95' style='stroke-width: 0.71; stroke: #1F75FE; fill: #1F75FE;' />
+<circle cx='246.37' cy='19.60' r='1.95' style='stroke-width: 0.71; stroke: #1F75FE; fill: #1F75FE;' />
+<line x1='331.07' y1='19.60' x2='344.89' y2='19.60' style='stroke-width: 1.07; stroke: #9ACEEB; stroke-linecap: butt;' />
+<line x1='331.07' y1='19.60' x2='344.89' y2='19.60' style='stroke-width: 1.07; stroke: #9ACEEB; stroke-linecap: butt;' />
+<circle cx='337.98' cy='19.60' r='1.95' style='stroke-width: 0.71; stroke: #9ACEEB; fill: #9ACEEB;' />
+<circle cx='337.98' cy='19.60' r='1.95' style='stroke-width: 0.71; stroke: #9ACEEB; fill: #9ACEEB;' />
+<text x='69.10' y='23.03' style='font-size: 9.60px; font-weight: bold; font-family: "Arial";' textLength='69.83px' lengthAdjust='spacingAndGlyphs'>New diagnoses</text>
+<text x='168.17' y='23.03' style='font-size: 9.60px; font-weight: bold; font-family: "Arial";' textLength='63.58px' lengthAdjust='spacingAndGlyphs'>TAIPAN Study</text>
+<text x='260.98' y='23.03' style='font-size: 9.60px; font-weight: bold; font-family: "Arial";' textLength='62.38px' lengthAdjust='spacingAndGlyphs'>Best estimate</text>
+<text x='352.60' y='23.03' style='font-size: 9.60px; font-weight: bold; font-family: "Arial";' textLength='68.22px' lengthAdjust='spacingAndGlyphs'>All simulations</text>
 </g>
 </svg>

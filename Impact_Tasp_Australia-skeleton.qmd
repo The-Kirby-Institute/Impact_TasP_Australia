@@ -1063,10 +1063,11 @@ if (!loadResults) {
 ```{r Plot specifications}
 
 # Choose some colours for plotting
-dput(PlotColors("crayons")[c("Black", "Gray", "Blue", "Cornflower", "Red", "Melon")])
+dput(PlotColors("crayons")[c("Black", "Gray", "Blue", "Cornflower", "Red", 
+  "Melon", "Green")])
 
-plotcols <- c(Black = "#000000", Gray = "#95918c", Blue = "#1f75fe", 
-  Cornflower = "#9aceeb", Red = "#ee204d", Melon = "#fdbcb4")
+plotcols <- c(black = "#000000", gray = "#95918c", blue = "#1f75fe", 
+  cornflower = "#9aceeb", red = "#ee204d", melon = "#fdbcb4", green = "#1cac78")
 
 # Function to extract hex values
 pc <- function(col) unname(plotcols[col])
@@ -1084,17 +1085,25 @@ figRowWidth <- 8/2.5
 # Extract results --------------------------------------------------------------
 validationData <- paramsBest %>% select(year, plhiv, diagnoses)
 
+# TAIPAN Results for incidence per 100,000 GBM or years 2010-2019
+taipanData <- c(0.64, 0.57, 0.55, 0.52, 0.46, 0.43, 0.29, 0.21, 0.25, 0.21) 
+
+# Adjust TAIPAN data by duplicating 2010 value for 2009 and then calculating the
+# relative change (compared to 2010) in new infections
+validationData$taipan <- resultsBest$newInfects[1] * 
+  c(taipanData[1], taipanData)/taipanData[1]
 
 plhivPlot <- ggplot(data = resultsSims, 
   aes(x = year, y = infected, group = simset)) + 
   geom_line(aes(colour = "sims")) +
   geom_line(data = resultsBest, aes(group = 1, colour = "best")) +
+  geom_line(data = validationData, aes(y = plhiv, group = 1), colour = pc("black")) +
   geom_point(data = validationData, aes(y = plhiv, group = 1, color = "data")) +
   expand_limits(y = c(0, NA)) + 
   scale_x_continuous(breaks = seq(2009, 2019, by = 2)) + 
   scale_colour_manual(name = "", 
     breaks = c("data", "best", "sims"), 
-    values = c(pc("Black"), pc("Blue"), pc("Cornflower")),
+    values = c(pc("black"), pc("blue"), pc("cornflower")),
     labels = c("HIV cascade estimates","Best estimate", "All simulations")) +
   xlab("Year") + ylab("Number of people with HIV") + 
   PlotOptions()
@@ -1103,13 +1112,16 @@ infectionsPlot <- ggplot(data = resultsSims,
   aes(x = year, y = newInfects, group = simset)) + 
   geom_line(aes(colour = "sims")) +
   geom_line(data = resultsBest, aes(group = 1, colour = "best")) +
+  geom_line(data = validationData, aes(y = diagnoses, group = 1), color = pc("black")) +
   geom_point(data = validationData, aes(y = diagnoses, group = 1, color = "data")) +
+  geom_line(data = validationData, aes(y = taipan, group = 1), color = pc("red")) +
+  geom_point(data = validationData, aes(y = taipan, group = 1, color = "taipan")) +
   expand_limits(y = c(0, NA)) + 
   scale_x_continuous(breaks = seq(2009, 2019, by = 2)) + 
   scale_colour_manual(name = "", 
-    breaks = c("data", "best", "sims"), 
-    values = c(pc("Black"), pc("Blue"), pc("Cornflower")),
-    labels = c("New diagnoses","Best estimate", "All simulations")) +
+    breaks = c("data", "taipan", "best", "sims"), 
+    values = c(pc("black"), pc("red"), pc("blue"), pc("cornflower")),
+    labels = c("New diagnoses", "TAIPAN Study", "Best estimate", "All simulations")) +
   xlab("Year") + ylab("Annual HIV infections") + 
   PlotOptions()
 
@@ -1194,14 +1206,14 @@ resultsPlhiv <- ggplot(data = scenarioResultsSims, aes(x = year, y = infected,
   # geom_ribbon(aes(ymin = quantile(infected, 0.025), 
   #   ymax = quantile(infected, 0.975))) + 
   geom_line(data = (scenarioResultsBest %>% filter(scenario == "base")), 
-    aes(group = 1), colour = pc("Blue"), size = 1.1) +
+    aes(group = 1), colour = pc("blue"), size = 1.1) +
   geom_line(data = (scenarioResultsBest %>% filter(scenario == "scenario")), 
-    aes(group = 1), colour = pc("Black"), size = 1.1) +
+    aes(group = 1), colour = pc("black"), size = 1.1) +
   expand_limits(y = c(0, NA)) + 
   scale_x_continuous(breaks = seq(2009, 2019, by = 2)) + 
   scale_colour_manual(name = "", 
     breaks = c("base", "scenario"), 
-    values = c(pc("Cornflower"), pc("Gray")),
+    values = c(pc("cornflower"), pc("gray")),
     labels = c("Baseline", "No increase in ART")) +
   xlab("Year") + ylab("Number of people with HIV") + 
   PlotOptions()
@@ -1210,14 +1222,14 @@ resultsInfects <- ggplot(data = scenarioResultsSims, aes(x = year, y = newInfect
   colour = scenario, group = interaction(scenario, simset))) + 
   geom_line() + 
   geom_line(data = (scenarioResultsBest %>% filter(scenario == "base")), 
-    aes(group = 1), colour = pc("Blue"), size = 1.1) +
+    aes(group = 1), colour = pc("blue"), size = 1.1) +
   geom_line(data = (scenarioResultsBest %>% filter(scenario == "scenario")), 
-    aes(group = 1), colour = pc("Black"), size = 1.1) +
+    aes(group = 1), colour = pc("black"), size = 1.1) +
   expand_limits(y = c(0, NA)) + 
   scale_x_continuous(breaks = seq(2009, 2019, by = 2)) + 
   scale_colour_manual(name = "", 
     breaks = c("base", "scenario"), 
-    values = c(pc("Cornflower"), pc("Gray")),
+    values = c(pc("cornflower"), pc("gray")),
     labels = c("Baseline", "No increase in ART")) +
   xlab("Year") + ylab("Annual HIV infections") + 
   PlotOptions()
@@ -1233,7 +1245,7 @@ resultsCumInfects <- ggplot(data = cumInfects, aes(x = scenario, y = infections)
   geom_boxplot(aes(fill = scenario), width = 0.75, alpha = 0.5) +
   scale_fill_manual(
     labels = c("base", "scenario"), 
-    values = c(pc("Cornflower"), pc("Black"))) +
+    values = c(pc("cornflower"), pc("black"))) +
   xlab("") + ylab("Cumulative infections") +
   scale_x_discrete(labels = c("Baseline", 
     "No increase in ART")) +
@@ -1247,7 +1259,7 @@ avertedInfects <- cumInfects %>%
   mutate(averted = scenario - base)
 
 resultsAverted <- ggplot(data = avertedInfects, aes(x = averted)) +
-  geom_density(alpha = 0.5, fill = pc("Cornflower")) +
+  geom_density(alpha = 0.5, fill = pc("cornflower")) +
   xlab("Infections averted") + ylab("Density") +
   PlotOptions() + theme(legend.position = "none")  
 
@@ -1402,9 +1414,9 @@ HEplot <- ggplot(data = barResultsBest , aes(x = indicator, y = cost / 1e6)) +
   geom_col(aes(fill = indicator), width = 0.5, alpha = 0.5) +
   geom_errorbar(data = barResultsSims, aes(y = median / 1e6, 
     ymin = lower95 / 1e6, ymax = upper95 / 1e6),
-    colour = "black", width = 0.25, size = 1.1) + 
+    colour = pc("black"), width = 0.25, size = 1.1) + 
   scale_fill_manual(name = "",
-    values = c(pc("Gray"), pc("Cornflower"), pc("Cornflower"),
+    values = c(pc("gray"), pc("cornflower"), pc("cornflower"),
     pc("Cornflower"))) +
   xlab("") + ylab("Millions AUD") +
   scale_x_discrete(labels = c("Additional\ntreatment\ncosts",
