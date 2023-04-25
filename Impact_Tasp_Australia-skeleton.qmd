@@ -824,7 +824,7 @@ solely driven by inflation and simply applying the recorded consumer price index
 everything remains the same as it was in 2019. Since 2009 there have been
 substantial changes to treatment guidelines for HIV in Australia as new drugs
 and formulations became available with demonstrated superiority over older
-regimens in clinical trials. [@noauthor_australian_2020] For example there has
+regimens in clinical trials.[@noauthor_australian_2020] For example there has
 been a marked decline in the use of non‑nucleoside reverse transcriptase
 inhibitors and an increase in integrate inhibitors to reduce the development of
 drug resistance.[@institute_hiv_2022] The proportion of people taking first,
@@ -848,11 +848,12 @@ We lacked overall cost data prior to 2013. To assess changes in price since
 2009, we reviewed data from the Australian Statistics of Medicine reports which
 are available up to 2015.[@care_pharmaceutical_nodate] These reports provide the
 total cost and the number of packs (2011 and prior) or scripts dispensed (from
-2012) of individual drugs. The change in reporting from packs to scripts makes
-it difficult to determine any trend in price over the 2009-2015 period. Looking
-at key drugs that formed part of ART regimens showed varying trends with some
+2012) of individual drugs. The change in reporting from packs to scripts and
+with many drugs currently in use only being available after 2009-2011 makes it
+difficult to determine any trend in price over the 2009-2015 period. Looking at
+key drugs that formed part of ART regimens showed varying trends with some
 remaining at a similar price while others increased or decreased over the
-2009-2011 and 2012-2015 periods (see Table S2).
+2009-2011 and 2012-2014 periods.
 
 Given the unclear data for ART drug costs over time we considered several
 inflationary and deflationary scenarios for the change in costs over 2009-2019.
@@ -1921,11 +1922,3 @@ DPMQ values obtained from the PBS website January
 reported costs were doubles because this study used a six-month timestep. The 
 first line cost is equal to the average of the three regimens considered.
 
-\newpage
-
-**Table S2** - Example Cost data for selected ART drugs used over 2009-2011 and
-2012-2014 from the Australian Statistics on Medicines. The costs were obtained 
-by dividing the total cost by the number of packs (for 2009-2011) or scripts 
-(2012-2015) reported.
-
-<!--# Table added manually to the rendered Word document -->
