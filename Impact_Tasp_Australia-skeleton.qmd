@@ -66,11 +66,11 @@ captions, reformatting references etc etc.
 
 ## Abstract
 
-**Background**: Several clinical trails have established that effective
+**Background**: Several clinical trials have established that effective
 treatment for HIV reduces morbidity and mortality and prevents transmission.
 This has resulted in changes in treatment guidelines and the concepts of
 "Treatment-as-Prevention" and "Undetectable equals Untransmissible (U=U)". We
-analysed the impact of increased ART on HIV epidemiology and healtcare costs in
+analysed the impact of increased ART on HIV epidemiology and healthcare costs in
 Australia.
 
 **Methods**: We conducted a retrospective modelling analysis in Australia over
@@ -674,7 +674,7 @@ coverage, and the scale-up of PrEP.
 #### Model equations
 
 To estimate the number of people living with HIV overtime we used the following
-difference equation
+difference equation:
 
 $$ 
 N_{t+1} = N_{t} + I_{t} + N^{o}_{t}, 
@@ -686,7 +686,7 @@ living with HIV arriving from overseas in year $t$.
 
 To calculate the number of new HIV infections in Australia each year we derived
 an equation that incorporates the effects of viral suppression due to treatment,
-HIV PrEP, and changes in sexual behaviour on transmission. First we assume the
+HIV PrEP, and changes in sexual behaviour on transmission. First, we assume the
 probability for a person with HIV with unsuppressed virus to transmit HIV to
 another person is fixed over time (denoted by $\beta$ per person per year). If
 no one is on effective treatment or PrEP and there is no change in prevention
@@ -703,8 +703,8 @@ but less than 100%.[@cohen_antiretroviral_2016] We assumed $\epsilon_{ART}$ was
 with range of
 `r FormatData(100*(parametersFixed %>% filter(code_variable == "effart"))$lower, places =0)` 
 -
-`r FormatPercent(100*(parametersFixed %>% filter(code_variable == "effart"))$upper, places =0)`
-. If in year $t$, the proportion of people with HIV diagnosed is $d_t$, the
+`r FormatPercent(100*(parametersFixed %>% filter(code_variable == "effart"))$upper, places =0)`.
+If in year $t$, the proportion of people with HIV diagnosed is $d_t$, the
 proportion diagnosed on ART is $\theta_t$ and the proportion treated with viral
 suppression is $\psi_t$ (following the HIV cascade steps) then the overall
 proportion virally suppressed will be $d_t\theta_t\psi_t$ and the value of
@@ -727,7 +727,7 @@ population.
 
 Combining each of these effects for viral suppression, PrEP, and the relative
 change in condom use gives the following equation for the number of new
-infections each year $$
+infections each year: $$
 I_{t+1} = N_t\beta(1-d_t\theta_t\psi_t\epsilon_s)(1-p_t \epsilon_p)\frac{(1-c_t \epsilon_c)}{(1-c_1\epsilon_c)}.
 $$ {#eq-incidence}
 
@@ -814,8 +814,7 @@ with 5% discounting. The Lim et al study also estimated the short- to medium-ter
 which can be used to estimate the annual cost of providing care and treatment.
 We divided the the undiscounted 10-year costing by 10 to estimate an annual cost
 in 2019 of
-`r FormatData((parametersFixed %>% filter(code_variable == "annual_cost"))$estimate, (parametersFixed %>% filter(code_variable == "annual_cost"))$lower, (parametersFixed %>% filter(code_variable == "annual_cost"))$upper, places = 0, prefix = "$")`
-.
+`r FormatData((parametersFixed %>% filter(code_variable == "annual_cost"))$estimate, (parametersFixed %>% filter(code_variable == "annual_cost"))$lower, (parametersFixed %>% filter(code_variable == "annual_cost"))$upper, places = 0, prefix = "$")`.
 
 To estimate retrospective costs for each year prior to 2019 is challenging due
 to a number of factors. The change in the cost of care and treatment is not
@@ -829,17 +828,17 @@ been a marked decline in the use of non‑nucleoside reverse transcriptase
 inhibitors and an increase in integrate inhibitors to reduce the development of
 drug resistance.[@institute_hiv_2022] The proportion of people taking first,
 second, and higher lines of ART also changes as people age and potentially
-develop other morbidities or drug resistance. Finally,individual drug prices
+develop other morbidities or drug resistance. Finally, individual drug prices
 change due to market forces and with the availability of generic versions as
 patents expire.
 
 The main contributor to HIV costs in Australia are drug
 costs.[@lim_lifetime_2022] To estimate the potential change in costs we first
-reviewed previous estimates for HIV care and treatment costs in
-Australia.[@schneider_cost-effectiveness_2014, @health_pharmaceutical_2017] One
-study estimated costs in 2013 AUD and this was updated to 2015 costs for a
-Pharmaceuticals Benefits Scheme application. The estimated costs for each line
-of ART compared to the Lim et al analysis are shown in Table S1 in the
+reviewed previous estimates for HIV care and treatment costs in Australia. One
+study estimated costs in 2013 AUD.[@schneider_cost-effectiveness_2014]. These
+estimates were updated to 2015 costs for a Pharmaceuticals Benefits Scheme
+application.[@health_pharmaceutical_2017] The estimated costs for each line of
+ART compared to the Lim et al analysis are shown in Table S1 in the
 Supplementary material.[@lim_lifetime_2022] Since 2013, the cost of first line
 therapy has remained relatively constant while higher lines of ART have fallen
 in price.
@@ -871,11 +870,11 @@ $2 \times I_R$ (Deflation 2 scenario) each year. Using the specified annual
 inflation/deflation rates we were then able to adjust the lifetime and annual
 costs in 2019 AUD to obtain costs for each year from 2009 to 2018.
 
-For each costing scenario we calculated the total cost of providing ART to
-people on treatment by multiplying the number on treatment by the annual
-treatment cost for that year. Similarly the lifetime costs for people newly
-infected with HIV were obtained by multiplying the number of new infections each
-year by the associated annual lifetime cost for that year.
+For each costing scenario we calculated the total cost of providing ART by
+multiplying the number on treatment by the annual treatment cost for that year.
+Similarly, the lifetime costs for people newly infected with HIV were obtained
+by multiplying the number of new infections each year by the associated annual
+lifetime cost for that year.
 
 #### Calculation scenarios
 
@@ -886,21 +885,21 @@ proportion of people diagnosed with HIV on ART matches the reported estimates
 for the 2009-2019 period. The second or counter-factual scenario assumes the
 level of ART coverage among the diagnosed population $\theta_t$ did not increase
 since the time early initiation of ART became established. We assumed this was
-after `r project$projectVars$indexYearART` the year after the landmark HPTN052
+after `r project$projectVars$indexYearART`, the year after the landmark HPTN052
 study was published and the year prior to the US DHHS recommendation that all
 people living with HIV initiate ART irrespective of CD4. While the Australian
 guidelines did not fully adapt the US DHHS recommendation, it was influential on
 clinical practice and there were recommendations to consider ART for all people
 with HIV including those with CD4 above 500 from 2013. In this year the
 estimated percentage of all GBM on ART was
-`r FormatPercent(100*(parametersVar %>% filter(year == project$projectVars$indexYearART))$prop_diagnosed, places = 1)`
-and in our counter-factual scenario we assumed this percentage was fixed from
+`r FormatPercent(100*(parametersVar %>% filter(year == project$projectVars$indexYearART))$prop_diagnosed, places = 1)`.
+In our counterfactual scenario we assumed this percentage was fixed from
 2011 to 2019.
 
 #### Model outputs
 
 Results were obtained for the best estimate inputs and from summary statistics
-for the all simulations. Total costs are in 2019 AUD and rounded to the nearest
+for all simulations. Total costs are in 2019 AUD and rounded to the nearest
 A\$1 million. All analyses and results were generated using R version 4.2.2 with
 reproducible code available in an open access repository along with input
 parameters and the results.[@gray_kirby_nodate]
@@ -1748,13 +1747,13 @@ over 2009-2019 on the number of new infections and HIV related healthcare costs.
 Using a simple HIV transmission model incorporating the effects of ART, PrEP,
 and changes in sexual behaviour we showed that increasing ART use during the
 period when early initiation of treatment and treatment as prevention became
-established could have averted a substantial number of new infections (
-`r FormatData((scenarioResultsBest %>% group_by(scenario) %>% summarise(infections = sum(newInfects)))$infections %>% diff(), quantile(avertedInfects$averted, probs = lprob),  quantile(avertedInfects$averted, probs = uprob), places = 0, rangestr = "95% PI: ")`
+established could have averted a substantial number of new infections 
+(`r FormatData((scenarioResultsBest %>% group_by(scenario) %>% summarise(infections = sum(newInfects)))$infections %>% diff(), quantile(avertedInfects$averted, probs = lprob),  quantile(avertedInfects$averted, probs = uprob), places = 0, rangestr = "95% PI: ")`
 decrease in cumulative infections compared to a no ART increase scenario) and be
 cost saving.
 
 While the cost-effectiveness of treatment as prevention has been evaluated in
-previous studies we believe this is the first costing analysis done for
+previous studies, we believe this is the first costing analysis done for
 Australia. In the majority of previous studies the results were obtained from
 future projections simulated by a model or were trial based.
 [@granich_expanding_2012; @kahn_cost-effectiveness_2011; @long_initiating_2017;
@@ -1768,7 +1767,7 @@ confirmation of those results and show the benefits to Australia.
 
 Given the simplicity of our analysis some caution is required when interpreting
 our results. Several assumptions were used to simplify the calculations. For
-example consistent condom use was used as a proxy for overall changes in sexual
+example, consistent condom use was used as a proxy for overall changes in sexual
 risk behaviour rather than incorporating the full range in risk reduction
 strategies GBM use against HIV infection. However, our model validation showed
 the number of people living with HIV overall was accurately reflected by the
@@ -1781,21 +1780,20 @@ available. In all likelihood including other populations would not change the
 conclusions of our results and only change the magnitude of the costs and
 benefits. The specifications of the counterfactual scenario where there was no
 increase in ART proportion since `r project$projectVars$indexYearART` could also
-affect the results. Varying the time the change occurred or incorporating the
+affect the results. Varying when the change occurred or incorporating the
 trends in this proportion prior to `r project$projectVars$indexYearART` would
 result in different outcomes for new infections, healthcare costs and lifetime
 care and treatment costs. However, the differences with the baseline for each of
 these would scale proportionally meaning there would be little change to the
 overall conclusions of the analyses. The main limitation is the lack of accurate
-retrospective cost data for ART and how these costs changed since `r
-project$projectVars$startYear`. We conducted a scenario analysis to cover the
+retrospective cost data for ART and how these costs have changed since `r projectVars$startYear`. We conducted a scenario analysis to cover the
 potential changes in treatment costs for those living with HIV over 2009-2019
 and lifetime care and treatment costs for those newly infected during this
 period. Even if we take the most expensive treatment cost scenario and the least
 expensive lifetime cost scenario the increase in ART would still be cost saving
 or at least cost neutral (see Figure fig-figure1 D). A more detailed and
 comprehensive modelling and costing analysis would change the estimates but is
-unlikely to change the overall conclusion that the increase in costs of
+unlikely to change the overall conclusion that the increase in the cost of
 providing care and treatment is negated by the reduction in lifetime HIV costs.
 
 Our results confirm the overall population level benefits of initiating ART and
