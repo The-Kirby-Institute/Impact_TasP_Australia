@@ -770,7 +770,7 @@ incorporate condom use over time, consistent condom use provides a suitable
 measure for the relative change in condom use during the treatment as prevention
 era and following the scale-up of PrEP. The resulting estimates are presented in
 @tbl-table2. Finally, the number of overseas born people living with HIV
-entering Australia each year ($N^o_t$ in @eq-plhiv ) was set to equal the annual
+entering Australia each year ($N^o_t$ in @eq-plhiv) was set to equal the annual
 number of notifications of people previously diagnosed
 overseas.[@institute_hiv_2022]
 
@@ -786,7 +786,7 @@ start to the end values. The resulting vector of multiplicative values was then
 applied to the corresponding time-varying parameter values to produce the values
 for the corresponding set of parameters.
 
-To run the calculations using Eqs. @eq-plhiv and @eq-incidence requires an
+To run the calculations using @eq-plhiv and @eq-incidence requires an
 initial estimate for $N_1$ and $I_1$ and the value of $N^o_1$ corresponding to
 the year 2009. We set $N_1$ to equal the estimated number of people with HIV in
 2009 from the Australian HIV cascade.[@institute_hiv_2022] To initialize new
@@ -797,7 +797,7 @@ and depend on testing, they area a reasonable indicator for new infections for
 Australian GBM due to the high testing rates in this
 population.[@jansson_inferring_2015] The estimates of PLHIV and the reported
 notifications excluding those previously diagnosed overseas after 2009 (as shown
-in @tbl-table2 ) are not used in the model calculations but were used for model
+in @tbl-table2) are not used in the model calculations but were used for model
 validation.
 
 #### HIV treatment costs
@@ -902,7 +902,11 @@ Results were obtained for the best estimate inputs and from summary statistics
 for the all simulations. Total costs are in 2019 AUD and rounded to the nearest
 A\$1 million. All analyses and results were generated using R version 4.2.2 with
 reproducible code available in an open access repository along with input
-parameters and the final results.[@gray_kirby_nodate].
+parameters and the results.[@gray_kirby_nodate]
+
+\newpage
+
+<!--# Move table to the end of the paper-->
 
 **Table 1** - Fixed input parameter estimates and ranges. Endnotes provide
 justifications for these parameter values. The simulations used for the
@@ -918,9 +922,9 @@ calculations take samples from these ranges assuming a uniform distribution.
 | $\epsilon_{condom}$             | Efficacy of condoms in preventing HIV transmission                                 | `r FormatData((parametersFixed %>% filter(code_variable == "effcondom"))$estimate, (parametersFixed %>% filter(code_variable == "effcondom"))$lower, (parametersFixed %>% filter(code_variable == "effcondom"))$upper)`                                                   | 5                                                                                    |
 | **HIV treatment costs**         |                                                                                    |                                                                                                                                                                                                                                                                           |                                                                                      |
 | $c_{ART}$                       | Average annual cost of providing care and ART in 2019 AUD                          | `r FormatData((parametersFixed %>% filter(code_variable == "annual_cost"))$estimate, (parametersFixed %>% filter(code_variable == "annual_cost"))$lower, (parametersFixed %>% filter(code_variable == "annual_cost"))$upper, places = 0, prefix = "$")`                   | 6                                                                                    |
-| $c^0_{life}$                    | Annual cost of providing care and ART post infection in 2019 AUD                   | `r FormatData((parametersFixed %>% filter(code_variable == "lifetime_cost_0d"))$estimate, (parametersFixed %>% filter(code_variable == "lifetime_cost_0d"))$lower, (parametersFixed %>% filter(code_variable == "lifetime_cost_0d"))$upper, places = 0, prefix = "$")`    | 7                                                                                    |
-| $c^{3.5}_{life}$                | Undiscounted lifetime cost of providing care and ART post infection in 2019 AUD    | `r FormatData((parametersFixed %>% filter(code_variable == "lifetime_cost_35d"))$estimate, (parametersFixed %>% filter(code_variable == "lifetime_cost_35d"))$lower, (parametersFixed %>% filter(code_variable == "lifetime_cost_35d"))$upper, places = 0, prefix = "$")` | 7                                                                                    |
-| $c^5_{life}$                    | Lifetime cost of providing care and ART post infection in 2019 AUD discounted 3.5% | `r FormatData((parametersFixed %>% filter(code_variable == "lifetime_cost_50d"))$estimate, (parametersFixed %>% filter(code_variable == "lifetime_cost_50d"))$lower, (parametersFixed %>% filter(code_variable == "lifetime_cost_50d"))$upper, places = 0, prefix = "$")` | Lifetime cost of providing HIV care and ART post infection in 2019 AUD discounted 5% |
+| $c^0_{life}$                    | Undiscounted lietime cost of providing care and ART post infection in 2019 AUD                   | `r FormatData((parametersFixed %>% filter(code_variable == "lifetime_cost_0d"))$estimate, (parametersFixed %>% filter(code_variable == "lifetime_cost_0d"))$lower, (parametersFixed %>% filter(code_variable == "lifetime_cost_0d"))$upper, places = 0, prefix = "$")`    | 7                                                                                    |
+| $c^{3.5}_{life}$                | Lifetime cost of providing care and ART post infection in 2019 AUD discounted 3.5%   | `r FormatData((parametersFixed %>% filter(code_variable == "lifetime_cost_35d"))$estimate, (parametersFixed %>% filter(code_variable == "lifetime_cost_35d"))$lower, (parametersFixed %>% filter(code_variable == "lifetime_cost_35d"))$upper, places = 0, prefix = "$")` | 7                                                                                    |
+| $c^5_{life}$                    | Lifetime cost of providing care and ART post infection in 2019 AUD discounted 5% | `r FormatData((parametersFixed %>% filter(code_variable == "lifetime_cost_50d"))$estimate, (parametersFixed %>% filter(code_variable == "lifetime_cost_50d"))$lower, (parametersFixed %>% filter(code_variable == "lifetime_cost_50d"))$upper, places = 0, prefix = "$")` | 7
 
 <!--# Move footnotes into table when formatting paper -->
 
@@ -946,7 +950,7 @@ calculations take samples from these ranges assuming a uniform distribution.
     in 2019 was obtained by taking the 10-year undiscounted cost reported in the
     Lim et al study[@lim_lifetime_2022] and dividing by 10 to produce a yearly
     cost.
-7.  The lifetime HIV costs were each discounting rate were obtained from Lim et
+7.  The lifetime HIV costs for each discounting rate were obtained from Lim et
     al.[@lim_lifetime_2022]
 
 \newpage
@@ -961,11 +965,11 @@ table2 <- parametersVar %>%
     "Notes" = NA) %>%
   arrange(factor(var_name, names(parametersVar)[2:ncol(parametersVar)], levels = names(parametersVar)[2:ncol(parametersVar)]))
 
-table2Caption <- "Time varying input parameter estimates. The assumed
-certainty range specifies the multiplicative factor used to generate uncertainty 
-estimates. Endnotes provide references and justifications. The values for PLHIV 
-and diagnoses after 2009 are not used in the calculations, rather they are used 
-for validation."
+table2Caption <- "Time varying input parameter estimates. The uncertainty 
+specifies the range of the multiplicative factor used to generate the uncertainty 
+estimates over time. The endnotes provide references and justifications. The 
+values for people living with HIV and diagnoses after 2009 are not used in the 
+calculations, instead they are used for validation."
 # Note the assumed uncertainty and notes number needs to be entered manually. 
 # The whole table then needs to be reformated. 
 ```
@@ -976,11 +980,12 @@ for validation."
 #| tbl-cap-location: top # Doesn't seem to work
 #| include: true
 #| output: asis
-knitr::kable(table2, row.names = FALSE, 
+knitr::kable(table2, digits = 3, row.names = FALSE, 
   caption = "Caption for cross-ref delete {#tbl-table2}")
 ```
 
-<!--# Move footnotes into table when formatting paper -->
+<!--# Move footnotes into table when formatting paper and move table to
+the end of the paper-->
 
 1.  Estimates for the number of GBM with HIV over 2009-2019 and the proportion
     diagnosed were estimated using the methodology for producing the Australian
@@ -1465,7 +1470,7 @@ if (savePlots) {
   
 }
 
-combinedPlotCaption <- "Summary of results from the baseline and no ART increase 
+combinedPlotCaption <- "Summary results from the baseline and no ART increase 
 scenarios. (A) Number of people living with HIV over 2009-2019. (B) Annual 
 number of new infections of HIV over 2009-2019. (C) Distribution in the total 
 number of infections during the 2009-2019 period. (D) Median and 95% percentile 
@@ -1477,7 +1482,7 @@ validationPlotCaption <- "Comparison of baseline scenario results to available
 published data. (A) Number of people living with HIV over 2009-2019 from all 
 simulations compared to estimates from the Australian HIV cascade (black discs). 
 (B) Annual number of new infections over 2009-2019 from all simulations compared 
-to reported notifications of HIV in MSM (excluding those previoulsy diagnosed 
+to reported notifications of HIV in MSM (excluding those previously diagnosed 
 overseas) and estimated new infections using the relative change in the incidence 
 per 100,000 GBM from the TAIPAN study (red line)."
 
@@ -1589,7 +1594,9 @@ if (savePlots) {
   
 }
 
-summaryTableCaption <- "Blah"
+summaryTableCaption <- "Summary results from the baseline and no ART increase 
+(counterfactual) scenarios for the two calculation scenarios. The range in 
+brackets is the 95% percentile interval."
 
 # Create a scenario table for the HE results -----------------------------------
 costSummaryTable <- tibble(
@@ -1642,8 +1649,9 @@ if (savePlots) {
   
 }
 
-costTableCaption <- "Comparison of additional treatment costs and reduction in lifetime
-HIV costs for each discounting and inflation scenario."
+costTableCaption <- "Comparison of additional treatment costs and reduction in 
+lifetime HIV costs for each discounting and inflation scenario. The range in 
+brackets is the 95% percentile interval. "
 
 ```
 
@@ -1810,6 +1818,8 @@ represent the position of the Australian Government. We thank Dr Jason Ong, Dr
 Sophy Shih, and Dr Caroline Watts for useful discussions regarding healthcare
 costs.
 
+\newpage
+
 ## References
 
 ::: {#refs} 
@@ -1894,12 +1904,12 @@ second, and third and higher lines of therapy in Australia in 2013, 2015, and
 
 <!--# Move footnotes into table when formatting paper -->
 
-1. The 2013 cost estimates came from Schnieder et
+1. The 2013 cost estimates came from Schneider et
 al.[@schneider_cost-effectiveness_2014] They are based on the dispensed price
 per maximum quantity (DPMQ) obtained from the Pharmaceutical Benefits Scheme
 (PBS) website which was accessed in February
-2013.[@noauthor_pharmaceutical_2020] The estimate for third and higher lines of
-ART is the average of the costs for third and fourth line ART.
+2013.[@noauthor_pharmaceutical_2020] The estimated cost for third and higher
+lines of ART is the average of the costs for third and fourth line ART.
 
 2. The 2015 cost estimates were used in a Pharmaceutical Benefits Scheme
 Advisory Committee (PBAC) submission.[@health_pharmaceutical_2017] They were
@@ -1908,8 +1918,8 @@ DPMQ values obtained from the PBS website January
 2016.[@noauthor_pharmaceutical_2020]
 
 3. The 2019 cost estimates were obtained from Lim et al.[@lim_lifetime_2022] All
-reported costs were doubles because this study used a six month timestep. First
-line cost is equal to the average of the three regimens considered.
+reported costs were doubles because this study used a six-month timestep. The 
+first line cost is equal to the average of the three regimens considered.
 
 \newpage
 
