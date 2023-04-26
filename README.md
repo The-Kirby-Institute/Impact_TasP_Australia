@@ -8,17 +8,16 @@ known as treatment-as-prevention (TasP).
 All calculations are primarily conducted using R (version 4.2.2) with associated
 packages (svglite 2.1.0; captioner 2.2.3; cowplot 1.1.1; scales 1.2.0; forcats
 0.5.1; stringr 1.4.0; dplyr 1.0.9; purrr; 0.3.4; readr 2.1.2; tidyr 1.2.0;
-tibble 3.1.8; ggplot2 3.3.6; tidyverse 1.3.2). Please report an issue if you
-want to run the code or contact Rgray@kirby.unsw.edu.au.  The code will be
-updated as required to correct issues. Please check for updated versions
-periodically.
-
+tibble 3.1.8; ggplot2 3.3.6; tidyverse 1.3.2). 
+  
 **Repository owner:** Richard T. Gray; [github/leftygray](https://github.com/leftygray); 
 [orcid.org/0000-0002-2885-0483](https://orcid.org/0000-0002-2885-0483)
 
 **Affiliation:** [_The Kirby Institute_](https://kirby.unsw.edu.au/), UNSW Sydney, Sydney NSW 2052, Australia
 
 **For any inquiries, please contact Rgray@kirby.unsw.edu.au** or flag an issue.
+The code will be updated as required to correct issues or do further analyses.
+Please check for updated versions periodically.
 
 ### Code summary and manuscript
 
