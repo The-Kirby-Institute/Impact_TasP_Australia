@@ -165,7 +165,7 @@ potential costs and benefits of increasing the proportion of people on ART up to
 
 # Load standard libraries and options
 library(tidyverse)
-library(LeftysRpkg)
+library(LeftysRpkg) # https://github.com/leftygray/LeftysRpkg
 library(scales)
 library(cowplot) # Note this masks ggsave with save_plot
 library(captioner)
