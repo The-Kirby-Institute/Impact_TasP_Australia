@@ -5,7 +5,7 @@ cost-effectiveness of early initiation of antiretroviral therapy (ART) to
 achieve undetectable viral load and untransmissable HIV (U=U) which is also
 known as treatment-as-prevention (TasP). 
 
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.786557.svg)](https://doi.org/10.5281/zenodo.78655776)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.7865576.svg)](https://doi.org/10.5281/zenodo.7865576)
 
 All calculations are primarily conducted using R (version 4.2.2) with associated
 packages (svglite 2.1.0; captioner 2.2.3; cowplot 1.1.1; scales 1.2.0; forcats
