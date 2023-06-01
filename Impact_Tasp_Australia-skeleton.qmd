@@ -76,7 +76,7 @@ Australia.
 **Methods**: We conducted a retrospective modelling analysis in Australia over
 the 2009-2019 period to calculate the potential impact of early initiation of
 ART and treatment as prevention on HIV among gay and bisexual men (GBM). We used
-a difference equation model that incorporates the change in the proportion
+a model that incorporates the change in the proportion
 diagnosed, treated, and virally suppressed as well as the scale-up of oral HIV
 pre-exposure prophylaxis (PrEP) and the change in sexual behaviour during this
 period. Data from national surveillance, behavioural survey, and clinical
@@ -84,7 +84,7 @@ cohorts was used to estimate model inputs. Using the model we simulated a
 baseline scenario for the period validated against available epidemiological
 data and a no ART increase scenario where the proportion on ART remains at the
 2011 level to assess the impact of early initiation and treatment as prevention.
-We also conduced a costing analysis for each scenario from a national health
+We also conducted a costing analysis for each scenario from a national health
 provider perspective using published HIV healthcare cost estimates in 2019 AUD
 and retrospective costing scenarios reflecting inflationary and deflationary
 changes in care and treatment costs since 2009.
@@ -125,16 +125,16 @@ treatment as prevention.[@granich_expanding_2012; @kahn_cost-effectiveness_2011;
 @long_initiating_2017; @eaton_health_2014] These studies generally conducted
 scenario analyses to project the future impact of ART and showed that early
 initiation would reduce new HIV infections and associated HIV care and treatment
-costs. For Australia, one study modelled the potential population level impact
-of increased testing and treatment.[@jansson_predicting_2013] Another
-longitudinal cohort study using routine health record data extracted from health
-services that provide HIV diagnosis and care to gay and bisexual men (GBM) in
-the Australian states of New South Wales and Victoria reported substantial
-population-level reductions in HIV incidence due to treatment-as-prevention.
-[@callander_hiv_2023] However, we are not aware of any retrospective studies
-estimating the national population level impact and cost effectiveness of
-increasing ART in Australia following changes in guidelines to recommend earlier
-initiation of ART.
+costs, potentially resulting in net savings. For Australia, one study modelled
+the potential population level impact of increased testing and
+treatment.[@jansson_predicting_2013] Another longitudinal cohort study using
+routine health record data extracted from health services that provide HIV
+diagnosis and care to gay and bisexual men (GBM) in the Australian states of New
+South Wales and Victoria reported substantial population-level reductions in HIV
+incidence due to treatment-as-prevention. [@callander_hiv_2023] However, we are
+not aware of any retrospective studies estimating the national population level
+impact and cost effectiveness of increasing ART in Australia following changes
+in guidelines to recommend earlier initiation of ART.
 
 As the evidence for the benefits of the early initiation of ART became apparent,
 HIV treatment guidelines in Australia changed. In 2007, guidelines started
@@ -662,7 +662,7 @@ PrEP on HIV infections.[@kelly_hiv_2015; @gray_funding_2017;
 publication of the HPTN 052 clinical trial results in mid-2011
 [@cohen_prevention_2011] to the start of the COVID-19 pandemic.
 
-For this analysis we focused on GBM living with HIV in Australia because they
+For this analysis we focused on GBM living with HIV because they
 make up the majority of people with HIV in Australia and use treatment and with
 undetectable viral load as a risk reduction strategy
 [@holt_community-level_2018]. For simplicity we did not stratify this population
@@ -682,7 +682,10 @@ $$ {#eq-plhiv}
 
 where $N_t$ is the number of people living with HIV in year $t$, $I_t$ is the
 number of new HIV infections in year $t$, and $N^o_t$ is the number of people
-living with HIV arriving from overseas in year $t$.
+living with HIV arriving from overseas in year $t$. Given the relatively slow
+dynamics of HIV epidemics this difference equation approach with a yearly time
+step is appropriate.[@] We also validated this approach for the HIV
+epidemiology among Australian GBM (see details below).
 
 To calculate the number of new HIV infections in Australia each year we derived
 an equation that incorporates the effects of viral suppression due to treatment,
@@ -690,8 +693,14 @@ HIV PrEP, and changes in sexual behaviour on transmission. First, we assume the
 probability for a person with HIV with unsuppressed virus to transmit HIV to
 another person is fixed over time (denoted by $\beta$ per person per year). If
 no one is on effective treatment or PrEP and there is no change in prevention
-strategies or sexual behaviour the number of new infections in year $t$ is
-$I_t = N_t \beta$.
+strategies or sexual behaviour the number of new infections in year $t$ is 
+$I_t = N_t \beta$. This means the $\beta$ parameter captures all the complex sexual
+behaviour among the GBM population. This is a similar approach to previous
+studies[@] and is appropriate because the focus of our analysis is on the
+impact of ART and PrEP rather than interventions aimed at changing sexual
+behaviour. The effects of changing trends in sexual behaviour (potentially due
+to ART and PrEP) are incorporated into the model through consistent condom use
+(see details below).
 
 People with viral suppression through effective ART have a lower probability of
 transmission given by a factor $(1-\epsilon_{ART})$. The concept of undetectable
@@ -750,13 +759,13 @@ the HIV cascade.[@institute_hiv_2022] The methods used to estimate the annual
 proportion diagnosed have been detailed previously in Australia's Annual
 Surveillance Reports with the code used for the calculations available online
 .[@gray_leftygraycascade_calculations_2022] For the treatment and suppression
-steps we followed a previous approach to estimating the HIV cascade for GBMSM.
+steps we followed a previous approach to estimating the HIV cascade for GBM.
 [@gray_undiagnosed_2018] To estimate the number of GBM taking ART we used the
 reported percentage on treatment from the Australian Trends in Behaviour Reports
 which collates data from Gay Community Periodic Surveys across Australia
 .[@mao_l_annual_2022] Defining viral suppression to be $<200$ cells/$\mu$l, data
 from the Australian HIV Observational Database was used to estimate the
-proportion virally suppressed using.[@noauthor_australian_2020] The resulting
+proportion virally suppressed.[@noauthor_australian_2020] The resulting
 proportions for each cascade step are shown in @tbl-table2. The Australian
 Trends in Behaviour Reports also provided data for the coverage of PrEP in the
 overall GBM population [@mao_l_annual_2022]. We estimated PrEP use by
@@ -802,11 +811,12 @@ validation.
 
 #### HIV treatment costs
 
-A recent health economics study by Lim et al provides estimates for the lifetime cost of
-providing HIV care and treatment to people living with HIV from a health
-provider perspective in Australia in 2019 Australian dollars
-(AUD).[@lim_lifetime_2022] The estimated cost varied from an undiscounted cost
-of
+We estimated the annual unit cost of providing HIV care and treatment to GBM
+separately for input into the model calculations. A recent health economics
+study by Lim et al provides estimates for the lifetime cost of providing HIV
+care and treatment to people living with HIV from a health provider perspective
+in Australia in 2019 Australian dollars (AUD).[@lim_lifetime_2022] The estimated
+cost varied from an undiscounted cost of
 `r FormatData((parametersFixed %>% filter(code_variable == "lifetime_cost_0d"))$estimate, (parametersFixed %>% filter(code_variable == "lifetime_cost_0d"))$lower, (parametersFixed %>% filter(code_variable == "lifetime_cost_0d"))$upper, places = 0, prefix = "$")`
 to
 `r FormatData((parametersFixed %>% filter(code_variable == "lifetime_cost_50d"))$estimate, (parametersFixed %>% filter(code_variable == "lifetime_cost_50d"))$lower, (parametersFixed %>% filter(code_variable == "lifetime_cost_50d"))$upper, places = 0, prefix = "$")`
@@ -855,32 +865,33 @@ remaining at a similar price while others increased or decreased over the
 2009-2011 and 2012-2014 periods.
 
 Given the unclear data for ART drug costs over time we considered several
-inflationary and deflationary scenarios for the change in costs over 2009-2019.
-For the base case we assumed there was no change in costs over 2009-2019 (no
-inflation scenario), so the cost of care and treatment for people living with
-HIV in 2009 was the same as for 2019. The other scenarios were based on the
-geometric mean of the annual CPI inflation rates over 2009-2019 obtained from
-the Australian Bureau of Statistics. [@noauthor_consumer_2023] This mean
+inflationary and deflationary scenarios for the change in annual unit costs over
+2009-2019. For the base case we assumed there was no change in costs over
+2009-2019 (no inflation scenario), so the cost of care and treatment for people
+living with HIV in 2009 was the same as for 2019. The other scenarios were based
+on the geometric mean of the annual CPI inflation rates over 2009-2019 obtained
+from the Australian Bureau of Statistics. [@noauthor_consumer_2023] This mean
 inflation rate $I_R$ was used as a base factor to define the costing scenarios.
 Two of these scenarios were inflationary with the cost of HIV care and treatment
-over 2009-2019 increasing annually at $I_R$ (Inflation 1 scenario) and
-$2 \times I_R$ (Inflation 2 scenario) and two scenarios were deflationary with
-the annual HIV costs decreasing by $I_R$ (Deflation 1 scenario) and
-$2 \times I_R$ (Deflation 2 scenario) each year. Using the specified annual
-inflation/deflation rates we were then able to adjust the lifetime and annual
-costs in 2019 AUD to obtain costs for each year from 2009 to 2018.
+over 2009-2019 increasing annually at $I_R$ (Inflation 1 scenario) and $2 \times
+I_R$ (Inflation 2 scenario) and two scenarios were deflationary with the annual
+HIV costs decreasing by $I_R$ (Deflation 1 scenario) and $2 \times I_R$
+(Deflation 2 scenario) each year. Using the specified annual inflation/deflation
+rates we were then able to adjust the lifetime and annual costs in 2019 AUD to
+obtain costs for each year from 2009 to 2018.
 
 For each costing scenario we calculated the total cost of providing ART by
-multiplying the number on treatment by the annual treatment cost for that year.
-Similarly, the lifetime costs for people newly infected with HIV were obtained
-by multiplying the number of new infections each year by the associated annual
-lifetime cost for that year.
+multiplying the number on treatment rom the model calculations by the annual
+care and treatment cost for that year. Similarly, the lifetime costs for people
+newly infected with HIV were obtained by multiplying the number of new
+infections estimated in the model each year by the associated annual lifetime
+cost for that year.
 
 #### Calculation scenarios
 
 To estimate the potential impact and costs associated with increased ART during
-the treatment-as-prevention era we simulated two scenarios using Eqs. @eq-plhiv
-and @eq-incidence. The first scenario represents the baseline scenario where the
+the treatment-as-prevention era we simulated two scenarios using Equations @eq-plhiv
+and @eq-incidence. The first scenario represents the retrospective baseline scenario where the
 proportion of people diagnosed with HIV on ART matches the reported estimates
 for the 2009-2019 period. The second or counter-factual scenario assumes the
 level of ART coverage among the diagnosed population $\theta_t$ did not increase
@@ -890,7 +901,7 @@ study was published and the year prior to the US DHHS recommendation that all
 people living with HIV initiate ART irrespective of CD4. While the Australian
 guidelines did not fully adapt the US DHHS recommendation, it was influential on
 clinical practice and there were recommendations to consider ART for all people
-with HIV including those with CD4 above 500 from 2013. In this year the
+with HIV including those with CD4 above 500 cells/$\mu$l from 2013. In this year the
 estimated percentage of all GBM on ART was
 `r FormatPercent(100*(parametersVar %>% filter(year == project$projectVars$indexYearART))$prop_diagnosed, places = 1)`.
 In our counterfactual scenario we assumed this percentage was fixed from
@@ -1544,7 +1555,7 @@ FormatCostDiffs <- function(indicator, digits = 0, scale = 0, flip = 1,
     places = digits, prefix = "$", rangestr = rangestr)
 }
 
-# unction to calculate and format the benefits-costs ratio or return on investment. 
+# Functions to calculate and format the benefits-costs ratio or return on investment. 
 calcROI <- function(base, indicator) {
   # This function assumes there is a cost saving between the additional ART costs
   # and the reduction in lifetime treatment and care costs
@@ -1564,10 +1575,20 @@ calcROI <- function(base, indicator) {
     probs = uprob
   )
 
-  return(FormatData(bestROI, lowerROI, upperROI, places = 2, rangestr = ""))
+  return(list(bestROI, lowerROI, upperROI))
 }
 
+FormatROI <- function(base, indicator) {
+  tempROI <- calcROI(base, indicator)
+  
+  return(FormatData(tempROI[[1]], tempROI[[2]], tempROI[[3]], places = 2)) 
+}
+
+# FormatData(bestROI, lowerROI, upperROI, places = 2, rangestr = "")
+
 # Create summary results table -------------------------------------------------
+mainROI <- calcROI("hc_base", "lc35")
+
 summaryTable <- tibble(Indicator = character(),
   status_quo =  character(),
   counterfactual = character()) %>%
@@ -1610,8 +1631,8 @@ summaryTable <- tibble(Indicator = character(),
     counterfactual = NA)) %>%
   bind_rows(tibble(
     Indicator = "Benefits-to-cost ratio", 
-    status_quo = calcROI("hc_base", "lc35"),
-    counterfactual = NA))
+    status_quo = FormatROI("hc_base", "lc35"),
+    counterfactual = NA)) %>%
   # Reorganize columns and rename
   select(Indicator, "No ART increase" = counterfactual, "Baseline" = status_quo)
 
@@ -1647,50 +1668,50 @@ costSummaryTable[["Cost indicator"]] <- c("Additional treatment costs",
 costSummaryTable[["No inflation"]] <- c(
   FormatCostDiffs("hc_base", flip = -1, scale = 6),
   FormatCostDiffs("lc0", scale = 6),
-  calcROI("hc_base", "lc0"),
+  FormatROI("hc_base", "lc0"),
   FormatCostDiffs("lc35", scale = 6),
-  calcROI("hc_base", "lc35"),
+  FormatROI("hc_base", "lc35"),
   FormatCostDiffs("lc50", scale = 6),
-  calcROI("hc_base", "lc50"))
+  FormatROI("hc_base", "lc50"))
 
 costSummaryTable[["Inflation scenario 1"]] <- c(
   FormatCostDiffs("hc_adjusted_i1", flip = -1, scale = 6),
   FormatCostDiffs("lc0_adjusted_i1", scale = 6),
-  calcROI("hc_adjusted_i1", "lc0_adjusted_i1"),
+  FormatROI("hc_adjusted_i1", "lc0_adjusted_i1"),
   FormatCostDiffs("lc35_adjusted_i1", scale = 6),
-  calcROI("hc_adjusted_i1", "lc35_adjusted_i1"),
+  FormatROI("hc_adjusted_i1", "lc35_adjusted_i1"),
   FormatCostDiffs("lc50_adjusted_i1", scale = 6),
-  calcROI("hc_adjusted_i1", "lc50_adjusted_i1"))
+  FormatROI("hc_adjusted_i1", "lc50_adjusted_i1"))
 
 costSummaryTable[["Inflation scenario 2"]] <- c(
   FormatCostDiffs("hc_adjusted_i2", flip = -1, scale = 6),
   FormatCostDiffs("lc0_adjusted_i2", scale = 6),
-  calcROI("hc_adjusted_i2", "lc0_adjusted_i2"),
+  FormatROI("hc_adjusted_i2", "lc0_adjusted_i2"),
   FormatCostDiffs("lc35_adjusted_i2", scale = 6),
-  calcROI("hc_adjusted_i2", "lc35_adjusted_i2"),
+  FormatROI("hc_adjusted_i2", "lc35_adjusted_i2"),
   FormatCostDiffs("lc50_adjusted_i2", scale = 6),
-  calcROI("hc_adjusted_i2", "lc50_adjusted_i2"))
+  FormatROI("hc_adjusted_i2", "lc50_adjusted_i2"))
 
 costSummaryTable[["Deflation scenario 1"]] <- c(
   FormatCostDiffs("hc_adjusted_d1", flip = -1, scale = 6),
   FormatCostDiffs("lc0_adjusted_d1", scale = 6),
-  calcROI("hc_adjusted_d1", "lc0_adjusted_d1"),
+  FormatROI("hc_adjusted_d1", "lc0_adjusted_d1"),
   FormatCostDiffs("lc35_adjusted_d1", scale = 6),
-  calcROI("hc_adjusted_d1", "lc35_adjusted_d1"),
+  FormatROI("hc_adjusted_d1", "lc35_adjusted_d1"),
   FormatCostDiffs("lc50_adjusted_d1", scale = 6),
-  calcROI("hc_adjusted_d1", "lc50_adjusted_d1"))
+  FormatROI("hc_adjusted_d1", "lc50_adjusted_d1"))
 
 costSummaryTable[["Deflation scenario 2"]] <- c(
   FormatCostDiffs("hc_adjusted_d2", flip = -1, scale = 6),
   FormatCostDiffs("lc0_adjusted_d2", scale = 6),
-  calcROI("hc_adjusted_d2", "lc0_adjusted_d2"), 
+  FormatROI("hc_adjusted_d2", "lc0_adjusted_d2"), 
   FormatCostDiffs("lc35_adjusted_d2", scale = 6),
-  calcROI("hc_adjusted_d2", "lc35_adjusted_d2"),
+  FormatROI("hc_adjusted_d2", "lc35_adjusted_d2"),
   FormatCostDiffs("lc50_adjusted_d2", scale = 6),
-  calcROI("hc_adjusted_d2", "lc50_adjusted_d2"))
+  FormatROI("hc_adjusted_d2", "lc50_adjusted_d2"))
 
 # Additional calculation for the lowest ROI
-calcROI("hc_adjusted_d2", "lc50_adjusted_i2")
+minROI <- calcROI("hc_adjusted_d2", "lc50_adjusted_i2")
 
 if (savePlots) {
   
@@ -1711,9 +1732,11 @@ percentile interval. "
 We estimate that increasing ART use since `r project$projectVars$indexYearART`
 averted an additional
 `r FormatData((scenarioResultsBest %>% group_by(scenario) %>% summarise(infections = sum(newInfects)))$infections %>% diff(), quantile(avertedInfects$averted, probs = lprob),  quantile(avertedInfects$averted, probs = uprob), places = 0, rangestr = "95% PI: ")`
-over 2009-2019. Without the increase in ART the number of people with HIV would
-have increased from `r Format2019("base", "infected", rangestr = "95% PI: ")` to
-`r Format2019("scenario", "infected", rangestr = "95% PI: ")` by 2019. This
+new HIV infections over 2009-2019. Without the increase in ART the number of people with HIV would have increased from 
+`r Format2019("base", "infected", rangestr = "95% PI: ")` 
+to
+`r Format2019("scenario", "infected", rangestr = "95% PI: ")` 
+by 2019. This
 results in an increase in the care and treatment costs for people with HIV
 during 2009-2019 of
 `r FormatCostDiffs("hc_base", flip = -1, rangestr = "95% PI: ", scale = 6)`
@@ -1722,14 +1745,16 @@ offset by a decrease in the lifetime HIV costs (with 3.5% discounting) of those
 newly infected of `r FormatCostDiffs("lc35", rangestr = "95% PI: ", scale = 6)`
 million AUD resulting in a net cost saving of
 `r  FormatData((abs(costDifferencesBest$lc35) - abs(costDifferencesBest$hc_base)) / (10^6), quantile((abs(costDifferencesSims$lc35) - abs(costDifferencesSims$hc_base)) / (10^6), probs = lprob), quantile((abs(costDifferencesSims$lc35) - abs(costDifferencesSims$hc_base)) / (10^6), probs = uprob), places = 0, prefix = "$", rangestr = "95%: ")`
-million AUD. This cost saving was maintained across various inflationary
+million AUD (and a benefits-to-cost ratio of
+`r FormatData(mainROI[[1]], places = 2)`
+). This cost saving was maintained across various inflationary
 costing scenarios.
 
 **Main results**
 
 The model estimated under the baseline scenario that the number of people living
 with HIV in 2019 was 
-`r Format2019("base", "infected", rangestr = "95% PI: ")`
+`r Format2019("base", "infected", rangestr = "95% percentile interval (PI): ")`
 with 
 `r Format2019("base", "newInfects", rangestr = "95% PI: ")` 
 new infections. This closely aligns with estimates from the Australian HIV
@@ -1748,7 +1773,7 @@ the analysis period.
 
 If there was no increase in ART since 
 `r project$projectVars$indexYearART` 
-(the counter factual scenario) the model estimated there would have have been
+(the counter factual scenario) the model estimates there would have been
 `r Format2019("scenario", "infected", rangestr = "95% PI: ")` 
 people living with HIV in 2019 (@fig-figure1 A) and
 `r Format2019("scenario", "newInfects", rangestr = "95% PI: ")` 
@@ -1766,10 +1791,10 @@ over 2009-2019 (@fig-figure1 C). This implies the increase in ART coverage since
 the start of the early initiation and treatment as prevention era could have
 averted an additional
 `r FormatData((scenarioResultsBest %>% group_by(scenario) %>% summarise(infections = sum(newInfects)))$infections %>% diff(), quantile(avertedInfects$averted, probs = lprob),  quantile(avertedInfects$averted, probs = uprob), places = 0, rangestr = "95% PI: ")`
-HIV infections.
+new HIV infections.
 
 If the cost of care and treatment did not change over 2009-2019 then the total
-HIV health care cost for this period was estimated to be
+HIV health care cost for this period is estimated to be
 `r FormatCosts("base", "hc_base", rangestr="95% PI: ", scale = 6)` 
 million AUD for the baseline scenario and
 `r FormatCosts("scenario", "hc_base", rangestr="95% PI: ", scale = 6)` 
@@ -1783,13 +1808,22 @@ million AUD for the baseline scenario to
 `r FormatCosts("scenario", "lc35", rangestr="95% PI: ", scale = 6)` 
 million AUD for the no increase in ART scenario. This is an increase of
 `r FormatCostDiffs("lc35", rangestr = "95% PI: ", scale = 6)` 
-million AUD which more than offsets the increase in HIV healthcare costs over
-this period giving a total cost saving of
+million AUD and an overall reduction in lifetime costs that more than offsets 
+the increase in HIV healthcare costs over this period giving a total cost saving 
+of
 `r  FormatData((abs(costDifferencesBest$lc35) - abs(costDifferencesBest$hc_base)) / (10^6), quantile((abs(costDifferencesSims$lc35) - abs(costDifferencesSims$hc_base)) / (10^6), probs = lprob), quantile((abs(costDifferencesSims$lc35) - abs(costDifferencesSims$hc_base)) / (10^6), probs = uprob), places = 0, prefix = "$", rangestr = "95%: ")`
-million AUD. Such a cost saving was achieved for each discounting scenario (see
-@fig-figure1 D) and for each inflationary and deflationary scenario as shown in
-tbl-table4. Even when the greatest HIV healthcare cost and the lowest HIV
-lifetime cost in tbl-table4 are compared there is still a cost saving.
+million AUD and a benefits-to-cost ratio of
+`r FormatData(mainROI[[1]], mainROI[[2]], mainROI[[3]], places = 2)` 
+. This means for every additional AUD spent on HIV care and treatment there is a
+`r FormatData(mainROI[[1]], places = 2)` 
+saving in HIV lifetime costs. Such a cost saving was achieved for each
+discounting scenario (see @fig-figure1 D) and for each inflationary and
+deflationary scenario as shown in tbl-table4. Even when the greatest HIV
+healthcare cost and the lowest HIV lifetime cost in tbl-table4 are compared
+there is still a cost saving [though the though the uncertainty range in the 
+benefits-to-cost ratio =
+`r  FormatData(minROI[[1]], minROI[[2]], minROI[[3]], places = 2)`
+includes 1].
 
 ## Discussion
 

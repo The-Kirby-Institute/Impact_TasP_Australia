@@ -1,10 +1,10 @@
-Indicator,status_quo,counterfactual
-People with HIV in 2019,"21,907 (20,753‒23,019)","23,219 (22,008‒24,404)"
-New infections in 2019,430 (266‒621),741 (580‒953)
-Cumulative infections,"5,696 (4,725‒6,818)","7,320 (6,289‒8,535)"
-Infections averted,"1,624 (1,220‒2,099)",NA
-Total treatment costs (no inflation),"$2,568 ($2,389‒2,756)","$2,271 ($2,098‒2,452)"
-Additional Treatment costs (no inflation),$296 ($235‒367),NA
-"Lifetime HIV care and treatment costs (discounted 3.5%, no inflation)","$1,607 ($1,333‒1,923)","$2,065 ($1,774‒2,408)"
-"Reduction in HIV care and treatment costs (discounted 3.5%, no inflation)",$458 ($344‒592),NA
-Benefits-to-cost ratio,1.54 (1.22‒1.95),NA
+Indicator,No ART increase,Baseline
+People with HIV in 2019,"23,219 (22,008‒24,404)","21,907 (20,753‒23,019)"
+New infections in 2019,741 (580‒953),430 (266‒621)
+Cumulative infections,"7,320 (6,289‒8,535)","5,696 (4,725‒6,818)"
+Infections averted,NA,"1,624 (1,220‒2,099)"
+Total treatment costs (no inflation),"$2,271 ($2,098‒2,452)","$2,568 ($2,389‒2,756)"
+Additional Treatment costs (no inflation),NA,$296 ($235‒367)
+"Lifetime HIV care and treatment costs (discounted 3.5%, no inflation)","$2,065 ($1,774‒2,408)","$1,607 ($1,333‒1,923)"
+"Reduction in HIV care and treatment costs (discounted 3.5%, no inflation)",NA,$458 ($344‒592)
+Benefits-to-cost ratio,NA,1.54 (1.22‒1.95)
