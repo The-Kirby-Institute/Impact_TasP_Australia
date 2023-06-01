@@ -1543,6 +1543,28 @@ FormatCostDiffs <- function(indicator, digits = 0, scale = 0, flip = 1,
     places = digits, prefix = "$", rangestr = rangestr)
 }
 
+# ROI Calculations.
+calcROI <- function(indicator) {
+  
+  costsART <- -(cumHEresultsBest %>% filter(scenario == "scenario"))[["hc_base"]] -
+      -(cumHEresultsBest %>% filter(scenario == "base"))[["hc_base"]] 
+  lifetime <- (cumHEresultsBest %>% filter(scenario == "scenario"))[[indicator]] -
+    (cumHEresultsBest %>% filter(scenario == "base"))[[indicator]] 
+  
+  bestROI <- lifetime/costsART
+  
+  lowerROI <- quantile(
+    costDifferencesSims[[indicator]] / -costDifferencesSims[["hc_base"]], 
+    probs = lprob
+  )
+  upperROI <- quantile(
+    costDifferencesSims[[indicator]] / -costDifferencesSims[["hc_base"]], 
+    probs = uprob
+  )
+
+  return(FormatData(bestROI, lowerROI, upperROI, places = 2, rangestr = ""))
+}
+
 # Create summary results table -------------------------------------------------
 summaryTable <- tibble(Indicator = character(),
   status_quo =  character(),
@@ -1582,7 +1604,7 @@ summaryTable <- tibble(Indicator = character(),
     counterfactual = FormatCosts("scenario", "lc35", scale = 6))) %>%
   bind_rows(tibble(
     Indicator = "Reduction in HIV care and treatment costs (discounted 3.5%, no inflation)", 
-    status_quo = FormatCostDiffs("lc35", flip = -1, scale = 6),
+    status_quo = FormatCostDiffs("lc35", flip = 1, scale = 6),
     counterfactual = NA)) %>%
   # Reorganize columns and rename
   select(Indicator, "No ART increase" = counterfactual, "Baseline" = status_quo)
