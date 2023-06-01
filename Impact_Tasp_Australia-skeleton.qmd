@@ -684,7 +684,8 @@ where $N_t$ is the number of people living with HIV in year $t$, $I_t$ is the
 number of new HIV infections in year $t$, and $N^o_t$ is the number of people
 living with HIV arriving from overseas in year $t$. Given the relatively slow
 dynamics of HIV epidemics this difference equation approach with a yearly time
-step is appropriate.[@] We also validated this approach for the HIV
+step is appropriate.[@kelly_hiv_2015; @gray_funding_2017;
+@scott_achieving_nodate] We also validated this approach for the HIV
 epidemiology among Australian GBM (see details below).
 
 To calculate the number of new HIV infections in Australia each year we derived
@@ -696,7 +697,8 @@ no one is on effective treatment or PrEP and there is no change in prevention
 strategies or sexual behaviour the number of new infections in year $t$ is 
 $I_t = N_t \beta$. This means the $\beta$ parameter captures all the complex sexual
 behaviour among the GBM population. This is a similar approach to previous
-studies[@] and is appropriate because the focus of our analysis is on the
+studies[@kelly_hiv_2015; @gray_funding_2017;
+@scott_achieving_nodate] and is appropriate because the focus of our analysis is on the
 impact of ART and PrEP rather than interventions aimed at changing sexual
 behaviour. The effects of changing trends in sexual behaviour (potentially due
 to ART and PrEP) are incorporated into the model through consistent condom use
