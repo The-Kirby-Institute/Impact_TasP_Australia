@@ -933,16 +933,15 @@ calculations take samples from these ranges assuming a uniform distribution.
     surveillance.[@institute_hiv_2022] The 2009 estimate was as the initial
     conditions for the model calculations with the remaining estimates used for
     validation (see @tbl-table2).
-2.  This value was calculated using Eq. @eq-incidence, the fixed input
-    parameters, the time-varying parameter values for the year 2009 in
-    @tbl-table2, and the initial values of people with HIV and the number of
-    notifications (excluding those previously diagnosed overseas) reported in
-    national surveillance.[@institute_hiv_2022] This value was then constant
-    over the calculation period.
-3.  The efficacy of ART was based on clinical trial
+2.  This value was calculated using @eq-incidence, the fixed input parameters,
+    the time-varying parameter values for the year 2009, and the initial values of
+    people with HIV and the number of notifications (excluding those previously
+    diagnosed overseas) reported in national surveillance.[@institute_hiv_2022] This
+    value was held constant over the calculation period.
+3.  The efficacy of ART is based on clinical trial
     results.[@noauthor_initiation_2015; @noauthor_trial_2015;
     @koenig_same-day_2017; @rosen_initiating_2016; @pilcher_effect_2017]
-4.  The efficacy of HIV PrEP was based on the results from the PROUD
+4.  The efficacy of HIV PrEP is based on the results from the PROUD
     study.[@mccormack_pre-exposure_2016]
 5.  The efficacy of condoms is based on the efficacy for consistent condom use
     reported by Smith et al.[@smith_condom_2015]
@@ -965,11 +964,13 @@ table2 <- parametersVar %>%
     "Notes" = NA) %>%
   arrange(factor(var_name, names(parametersVar)[2:ncol(parametersVar)], levels = names(parametersVar)[2:ncol(parametersVar)]))
 
-table2Caption <- "Time varying input parameter estimates. The uncertainty 
-specifies the range of the multiplicative factor used to generate the uncertainty 
-estimates over time. The endnotes provide references and justifications. The 
-values for people living with HIV and diagnoses after 2009 are not used in the 
-calculations, instead they are used for validation."
+table2Caption <- "Time varying input parameter estimates. These parameters are 
+estimated separately for input into the model with an estimated value each year 
+and an uncertainty range obtained using an assumed multiplicative factor. The 
+uncertainty specifies the range of the multiplicative factor used to generate 
+the uncertainty estimates over time. The endnotes provide references and 
+justifications. The values for people living with HIV and diagnoses after 2009 
+are not used in the calculations, instead they are used for validation."
 # Note the assumed uncertainty and notes number needs to be entered manually. 
 # The whole table then needs to be reformated. 
 ```
@@ -1543,22 +1544,23 @@ FormatCostDiffs <- function(indicator, digits = 0, scale = 0, flip = 1,
     places = digits, prefix = "$", rangestr = rangestr)
 }
 
-# ROI Calculations.
-calcROI <- function(indicator) {
-  
-  costsART <- -(cumHEresultsBest %>% filter(scenario == "scenario"))[["hc_base"]] -
-      -(cumHEresultsBest %>% filter(scenario == "base"))[["hc_base"]] 
+# unction to calculate and format the benefits-costs ratio or return on investment. 
+calcROI <- function(base, indicator) {
+  # This function assumes there is a cost saving between the additional ART costs
+  # and the reduction in lifetime treatment and care costs
+  costsART <- -(cumHEresultsBest %>% filter(scenario == "scenario"))[[base]] -
+      -(cumHEresultsBest %>% filter(scenario == "base"))[[base]] 
   lifetime <- (cumHEresultsBest %>% filter(scenario == "scenario"))[[indicator]] -
     (cumHEresultsBest %>% filter(scenario == "base"))[[indicator]] 
   
   bestROI <- lifetime/costsART
   
   lowerROI <- quantile(
-    costDifferencesSims[[indicator]] / -costDifferencesSims[["hc_base"]], 
+    costDifferencesSims[[indicator]] / -costDifferencesSims[[base]], 
     probs = lprob
   )
   upperROI <- quantile(
-    costDifferencesSims[[indicator]] / -costDifferencesSims[["hc_base"]], 
+    costDifferencesSims[[indicator]] / -costDifferencesSims[[base]], 
     probs = uprob
   )
 
@@ -1606,6 +1608,10 @@ summaryTable <- tibble(Indicator = character(),
     Indicator = "Reduction in HIV care and treatment costs (discounted 3.5%, no inflation)", 
     status_quo = FormatCostDiffs("lc35", flip = 1, scale = 6),
     counterfactual = NA)) %>%
+  bind_rows(tibble(
+    Indicator = "Benefits-to-cost ratio", 
+    status_quo = calcROI("hc_base", "lc35"),
+    counterfactual = NA))
   # Reorganize columns and rename
   select(Indicator, "No ART increase" = counterfactual, "Baseline" = status_quo)
 
@@ -1618,51 +1624,73 @@ if (savePlots) {
 
 summaryTableCaption <- "Summary results from the baseline and no ART increase 
 (counterfactual) scenarios for the two calculation scenarios. The range in 
-brackets is the 95% percentile interval."
+brackets is the 95% percentile interval. Costs are rounded to the nearest 
+million and in 2019 AUD.  "
 
 # Create a scenario table for the HE results -----------------------------------
 costSummaryTable <- tibble(
-  "Cost indicator" = character(4),
-  "Deflation scenario 2" = character(4),
-  "Deflation scenario 1" = character(4),
-  "No inflation" = character(4),
-  "Inflation scenario 1" = character(4),
-  "Inflation scenario 2" = character(4)) 
+  "Cost indicator" = character(7),
+  "Deflation scenario 2" = character(7),
+  "Deflation scenario 1" = character(7),
+  "No inflation" = character(7),
+  "Inflation scenario 1" = character(7),
+  "Inflation scenario 2" = character(7)) 
 
 costSummaryTable[["Cost indicator"]] <- c("Additional treatment costs",
   "Reduction in lifetime HIV costs (no discounting)", 
+  "Benefits-to-cost ratio (no discounting)",
   "Reduction in lifetime HIV costs (3.5% discounting)",
-  "Reduction in lifetime HIV costs (5% discounting)")
+  "Benefits-to-cost ratio (3.5% discounting)",
+  "Reduction in lifetime HIV costs (5% discounting)",
+  "Benefits-to-cost ratio (5% discounting)")
 
 costSummaryTable[["No inflation"]] <- c(
   FormatCostDiffs("hc_base", flip = -1, scale = 6),
   FormatCostDiffs("lc0", scale = 6),
+  calcROI("hc_base", "lc0"),
   FormatCostDiffs("lc35", scale = 6),
-  FormatCostDiffs("lc50", scale = 6))
+  calcROI("hc_base", "lc35"),
+  FormatCostDiffs("lc50", scale = 6),
+  calcROI("hc_base", "lc50"))
 
 costSummaryTable[["Inflation scenario 1"]] <- c(
   FormatCostDiffs("hc_adjusted_i1", flip = -1, scale = 6),
   FormatCostDiffs("lc0_adjusted_i1", scale = 6),
+  calcROI("hc_adjusted_i1", "lc0_adjusted_i1"),
   FormatCostDiffs("lc35_adjusted_i1", scale = 6),
-  FormatCostDiffs("lc50_adjusted_i1", scale = 6))
+  calcROI("hc_adjusted_i1", "lc35_adjusted_i1"),
+  FormatCostDiffs("lc50_adjusted_i1", scale = 6),
+  calcROI("hc_adjusted_i1", "lc50_adjusted_i1"))
 
 costSummaryTable[["Inflation scenario 2"]] <- c(
   FormatCostDiffs("hc_adjusted_i2", flip = -1, scale = 6),
   FormatCostDiffs("lc0_adjusted_i2", scale = 6),
+  calcROI("hc_adjusted_i2", "lc0_adjusted_i2"),
   FormatCostDiffs("lc35_adjusted_i2", scale = 6),
-  FormatCostDiffs("lc50_adjusted_i2", scale = 6))
+  calcROI("hc_adjusted_i2", "lc35_adjusted_i2"),
+  FormatCostDiffs("lc50_adjusted_i2", scale = 6),
+  calcROI("hc_adjusted_i2", "lc50_adjusted_i2"))
 
 costSummaryTable[["Deflation scenario 1"]] <- c(
   FormatCostDiffs("hc_adjusted_d1", flip = -1, scale = 6),
   FormatCostDiffs("lc0_adjusted_d1", scale = 6),
+  calcROI("hc_adjusted_d1", "lc0_adjusted_d1"),
   FormatCostDiffs("lc35_adjusted_d1", scale = 6),
-  FormatCostDiffs("lc50_adjusted_d1", scale = 6))
+  calcROI("hc_adjusted_d1", "lc35_adjusted_d1"),
+  FormatCostDiffs("lc50_adjusted_d1", scale = 6),
+  calcROI("hc_adjusted_d1", "lc50_adjusted_d1"))
 
 costSummaryTable[["Deflation scenario 2"]] <- c(
   FormatCostDiffs("hc_adjusted_d2", flip = -1, scale = 6),
   FormatCostDiffs("lc0_adjusted_d2", scale = 6),
+  calcROI("hc_adjusted_d2", "lc0_adjusted_d2"), 
   FormatCostDiffs("lc35_adjusted_d2", scale = 6),
-  FormatCostDiffs("lc50_adjusted_d2", scale = 6))
+  calcROI("hc_adjusted_d2", "lc35_adjusted_d2"),
+  FormatCostDiffs("lc50_adjusted_d2", scale = 6),
+  calcROI("hc_adjusted_d2", "lc50_adjusted_d2"))
+
+# Additional calculation for the lowest ROI
+calcROI("hc_adjusted_d2", "lc50_adjusted_i2")
 
 if (savePlots) {
   
@@ -1672,8 +1700,9 @@ if (savePlots) {
 }
 
 costTableCaption <- "Comparison of additional treatment costs and reduction in 
-lifetime HIV costs for each discounting and inflation scenario. The range in 
-brackets is the 95% percentile interval. "
+lifetime HIV costs for each discounting and inflation scenario in millions of 
+2019 AUD (round to the nearest million). The range in brackets is the 95% 
+percentile interval. "
 
 ```
 
